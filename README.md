@@ -9,5 +9,5 @@ Requirements:
 <?php
 
 $client = new \JournyIO\Client($http, "apiKey");
-$client->trackEvent($email, "trail started", ["system/name" => "John Doe"]);
+$client->trackEvent($email, "trial started", ["system/name" => "John Doe"]);
 ```
