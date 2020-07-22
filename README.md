@@ -8,6 +8,6 @@ Requirements:
 ```php
 <?php
 
-$client = new Client($httpClient, "apiKey");
-$client->track("...");
+$client = new \JournyIO\Client($http, "apiKey");
+$client->trackEvent($email, "trail started");
 ```
