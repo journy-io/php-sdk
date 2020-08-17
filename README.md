@@ -11,3 +11,5 @@ Requirements:
 $client = new \JournyIO\Client($http, "apiKey");
 $client->trackEvent($email, "trial started", ["system/name" => "John Doe"]);
 ```
+
+* https://segment.com/blog/how-to-make-async-requests-in-php/
