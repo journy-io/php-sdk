@@ -104,13 +104,20 @@ $call = $client->upsertUser("userId", "name@domain.tld", [
 #### Create or update account
 
 ```php
-$call = $client->upsertAccount("accountId", "name", [
-    "plan" => "Pro",
-    "age" => 26,
-    "is_developer" => true,
-    "registered_at" => new DateTimeImmutable("..."),
-    "this_property_will_be_deleted" => "",
-]);
+$members = ["userId", "userId"];
+
+$call = $client->upsertAccount(
+    "accountId",
+    "name",
+    [
+        "plan" => "Pro",
+        "age" => 26,
+        "is_developer" => true,
+        "registered_at" => new DateTimeImmutable("..."),
+        "this_property_will_be_deleted" => "",
+    ],
+    $members
+);
 ```
 
 #### Add event for user
