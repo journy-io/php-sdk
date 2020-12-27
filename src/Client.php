@@ -389,7 +389,7 @@ final class Client
             $payload["properties"] = $this->formatProperties($properties);
         }
 
-        if (!empty($memberIds)) {
+        if (is_array($memberIds)) {
             $payload["members"] = array_map(
                 function ($value) {
                     return (string) $value;
