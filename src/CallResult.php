@@ -2,7 +2,7 @@
 
 namespace JournyIO\SDK;
 
-final class Result
+final class CallResult
 {
     private $succeeded;
     private $rateLimited;
@@ -17,7 +17,7 @@ final class Result
         int $remainingRequests,
         int $maxRequests,
         array $errors = [],
-        $result = null
+        ReturnValue $result = null
     ) {
         $this->succeeded = $succeeded;
         $this->rateLimited = $rateLimited;
@@ -27,32 +27,32 @@ final class Result
         $this->result = $result;
     }
 
-    public function succeeded()
+    public function succeeded(): bool
     {
         return $this->succeeded;
     }
 
-    public function rateLimited()
+    public function rateLimited(): bool
     {
         return $this->rateLimited;
     }
 
-    public function remainingRequests()
+    public function remainingRequests(): int
     {
         return $this->remainingRequests;
     }
 
-    public function maxRequests()
+    public function maxRequests(): int
     {
         return $this->maxRequests;
     }
 
-    public function errors()
+    public function errors(): array
     {
         return $this->errors;
     }
 
-    public function result()
+    public function result(): ReturnValue
     {
         return $this->result;
     }

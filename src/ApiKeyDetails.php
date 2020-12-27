@@ -2,7 +2,7 @@
 
 namespace JournyIO\SDK;
 
-final class ApiKeyDetails
+final class ApiKeyDetails implements ReturnValue
 {
     private $permissions;
 
@@ -14,7 +14,7 @@ final class ApiKeyDetails
         $this->permissions = $permissions;
     }
 
-    public function getPermissions()
+    public function getPermissions(): array
     {
         return $this->permissions;
     }

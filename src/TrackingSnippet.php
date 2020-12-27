@@ -2,7 +2,7 @@
 
 namespace JournyIO\SDK;
 
-final class TrackingSnippet
+final class TrackingSnippet implements ReturnValue
 {
     private $domain;
     private $snippet;
@@ -13,12 +13,12 @@ final class TrackingSnippet
         $this->snippet = $snippet;
     }
 
-    public function getDomain()
+    public function getDomain(): string
     {
         return $this->domain;
     }
 
-    public function getSnippet()
+    public function getSnippet(): string
     {
         return $this->snippet;
     }

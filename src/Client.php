@@ -1,10 +1,11 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace JournyIO\SDK;
 
+use Buzz\Client\Curl;
+use DateTimeInterface;
 use InvalidArgumentException;
+use Nyholm\Psr7\Factory\Psr17Factory;
 use Nyholm\Psr7\Uri;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
@@ -45,19 +46,27 @@ final class Client
         $this->rootUrl = $config["rootUrl"] ?? "https://api.journy.io";
     }
 
-    private function withAuthentication(RequestInterface $request)
+    public static function withDefaults(string $apiKey): Client
+    {
+        $factory = new Psr17Factory();
+        $http = new Curl($factory, ["timeout" => 5]);
+
+        return new Client($http, $factory, $factory, ["apiKey" => $apiKey]);
+    }
+
+    private function withAuthentication(RequestInterface $request): RequestInterface
     {
         return $request->withAddedHeader("x-api-key", $this->apiKey);
     }
 
-    private function getMaxRequests(ResponseInterface $response)
+    private function getMaxRequests(ResponseInterface $response): int
     {
         $values = $response->getHeader("x-ratelimit-limit");
 
         return count($values) > 0 ? (int) $values[0] : 0;
     }
 
-    private function getRemainingRequests(ResponseInterface $response)
+    private function getRemainingRequests(ResponseInterface $response): int
     {
         $values = $response->getHeader("x-ratelimit-remaining");
 
@@ -66,28 +75,43 @@ final class Client
 
     private function check(ResponseInterface $response)
     {
-        if ($response->getStatusCode() === 500) {
-            return new Result(
+        if ($response->getStatusCode() === 401) {
+            $response->getBody()->rewind();
+            $json = json_decode($response->getBody()->getContents(), true);
+
+            return new CallResult(
                 false,
                 false,
                 $this->getRemainingRequests($response),
                 $this->getMaxRequests($response),
-                ["unexpected error"] // TODO
+                [$json["message"]],
+                null
+            );
+        }
+
+        if ($response->getStatusCode() === 500) {
+            return new CallResult(
+                false,
+                false,
+                $this->getRemainingRequests($response),
+                $this->getMaxRequests($response),
+                ["something unexpected happened"]
             );
         }
 
         if ($response->getStatusCode() === 429) {
-            return new Result(
+            return new CallResult(
                 false,
                 true,
                 $this->getRemainingRequests($response),
                 $this->getMaxRequests($response),
+                ["rate limited"],
                 null
             );
         }
     }
 
-    public function getApiKeyDetails()
+    public function getApiKeyDetails(): CallResult
     {
         $response = $this->http->sendRequest(
             $this->withAuthentication(
@@ -104,36 +128,42 @@ final class Client
             return $result;
         }
 
-        $json = json_decode($response->getBody(), true);
+        $response->getBody()->rewind();
+        $json = json_decode($response->getBody()->getContents(), true);
 
         if ($response->getStatusCode() === 200) {
-            return new Result(
+            return new CallResult(
                 true,
                 false,
                 $this->getRemainingRequests($response),
                 $this->getMaxRequests($response),
                 [],
-                new ApiKeyDetails($json['data']['permissions'])
+                new ApiKeyDetails($json["data"]["permissions"])
             );
         }
 
-        return new Result(
+        return new CallResult(
             false,
             false,
             $this->getRemainingRequests($response),
             $this->getMaxRequests($response),
-            $json['errors'],
+            $json['errors'] ?: [],
             null
         );
     }
 
-    public function getTrackingSnippet(string $domain)
+    public function getTrackingSnippet(string $domain): CallResult
     {
+        if (empty($domain)) {
+            throw new InvalidArgumentException("Domain cannot be empty!");
+        }
+
+        $encodedDomain = urlencode($domain);
         $response = $this->http->sendRequest(
             $this->withAuthentication(
                 $this->requestFactory->createRequest(
                     "GET",
-                    new Uri("{$this->rootUrl}/tracking/snippet")
+                    new Uri("{$this->rootUrl}/tracking/snippet?domain={$encodedDomain}")
                 )
             )
         );
@@ -144,10 +174,11 @@ final class Client
             return $result;
         }
 
-        $json = json_decode($response->getBody(), true);
+        $response->getBody()->rewind();
+        $json = json_decode($response->getBody()->getContents(), true);
 
         if ($response->getStatusCode() === 200) {
-            return new Result(
+            return new CallResult(
                 true,
                 false,
                 $this->getRemainingRequests($response),
@@ -160,26 +191,55 @@ final class Client
             );
         }
 
-        return new Result(
+        return new CallResult(
             false,
             false,
             $this->getRemainingRequests($response),
             $this->getMaxRequests($response),
-            $json['errors'],
+            $json['errors'] ?: [],
             null
         );
     }
 
-    public function addEvent(string $name, string $userId = null, string $accountId = null)
+    public function addUserEvent(string $name, string $userId): CallResult
     {
+        return $this->addEvent($name, $userId);
+    }
+
+    public function addAccountEvent(string $name, string $accountId, string $userId = null): CallResult
+    {
+        return $this->addEvent($name, $userId, $accountId);
+    }
+
+    private function addEvent(string $name, string $userId = null, string $accountId = null): CallResult
+    {
+        if (empty($name)) {
+            throw new InvalidArgumentException("Event name cannot be empty!");
+        }
+
+        if (preg_match("/^[a-z_]+$/", $name, $matches) === 0) {
+            throw new InvalidArgumentException("Event names need to be lowercase with underscores!");
+        }
+
+        if (empty($userId) && empty($accountId)) {
+            throw new InvalidArgumentException("At least one identifier needs to be set!");
+        }
+
+        $identification = [];
+
+        if ($userId) {
+            $identification["userId"] = $userId;
+        }
+
+        if ($accountId) {
+            $identification["accountId"] = $accountId;
+        }
+
         $body = $this->streamFactory->createStream(
             json_encode(
                 array(
                     'name' => $name,
-                    'identification' => [
-                        'user_id' => $userId,
-                        'account_id' => $accountId,
-                    ],
+                    'identification' => $identification,
                 )
             )
         );
@@ -191,6 +251,7 @@ final class Client
                         "POST",
                         new Uri("{$this->rootUrl}/events")
                     )
+                    ->withHeader("content-type", "application/json")
                     ->withBody($body)
             )
         );
@@ -201,10 +262,11 @@ final class Client
             return $result;
         }
 
-        $json = json_decode($response->getBody(), true);
+        $response->getBody()->rewind();
+        $json = json_decode($response->getBody()->getContents(), true);
 
-        if ($response->getStatusCode() === 200) {
-            return new Result(
+        if ($response->getStatusCode() === 201) {
+            return new CallResult(
                 true,
                 false,
                 $this->getRemainingRequests($response),
@@ -214,27 +276,57 @@ final class Client
             );
         }
 
-        return new Result(
+        return new CallResult(
             false,
             false,
             $this->getRemainingRequests($response),
             $this->getMaxRequests($response),
-            $json['errors'],
+            $json['errors'] ?: [],
             null
         );
     }
 
-    public function upsertUser(string $id, string $email, array $properties = [])
+    private function formatProperties(array $properties)
     {
-        $body = $this->streamFactory->createStream(
-            json_encode(
-                array(
-                    'id' => $id,
-                    'email' => $email,
-                    'properties' => $properties,
-                )
-            )
-        );
+        $formatted = array();
+
+        foreach ($properties as $name => $value) {
+            if (is_int($value) || is_float($value) || is_string($value)) {
+                $formatted[$name] = (string) $value;
+            }
+
+            if (is_bool($value)) {
+                $formatted[$name] = $value ? "true" : "false";
+            }
+
+            if ($value instanceof DateTimeInterface) {
+                $formatted[$name] = $value->format(DATE_ATOM);
+            }
+        }
+
+        return $formatted;
+    }
+
+    public function upsertUser(string $id, string $email, array $properties = []): CallResult
+    {
+        if (empty($id)) {
+            throw new InvalidArgumentException("User ID cannot be empty!");
+        }
+
+        if (empty($email)) {
+            throw new InvalidArgumentException("Email cannot be empty!");
+        }
+
+        $payload = [
+            "userId" => $id,
+            "email" => $email,
+        ];
+
+        if (!empty($properties)) {
+            $payload["properties"] = $this->formatProperties($properties);
+        }
+
+        $body = $this->streamFactory->createStream(json_encode($payload));
 
         $response = $this->http->sendRequest(
             $this->withAuthentication(
@@ -243,6 +335,7 @@ final class Client
                         "POST",
                         new Uri("{$this->rootUrl}/users/upsert")
                     )
+                    ->withHeader("content-type", "application/json")
                     ->withBody($body)
             )
         );
@@ -253,10 +346,11 @@ final class Client
             return $result;
         }
 
-        $json = json_decode($response->getBody(), true);
+        $response->getBody()->rewind();
+        $json = json_decode($response->getBody()->getContents(), true);
 
-        if ($response->getStatusCode() === 200) {
-            return new Result(
+        if ($response->getStatusCode() === 201) {
+            return new CallResult(
                 true,
                 false,
                 $this->getRemainingRequests($response),
@@ -266,28 +360,45 @@ final class Client
             );
         }
 
-        return new Result(
+        return new CallResult(
             false,
             false,
             $this->getRemainingRequests($response),
             $this->getMaxRequests($response),
-            $json['errors'],
+            $json['errors'] ?: [],
             null
         );
     }
 
-    public function upsertAccount(string $id, string $name, array $properties = [], array $members = null)
+    public function upsertAccount(string $id, string $name, array $properties = [], array $memberIds = null): CallResult
     {
-        $body = $this->streamFactory->createStream(
-            json_encode(
-                array(
-                    'id' => $id,
-                    'name' => $name,
-                    'properties' => $properties,
-                    'members' => $members,
-                )
-            )
-        );
+        if (empty($id)) {
+            throw new InvalidArgumentException("Account ID cannot be empty!");
+        }
+
+        if (empty($name)) {
+            throw new InvalidArgumentException("Name cannot be empty!");
+        }
+
+        $payload = [
+            "accountId" => $id,
+            "name" => $name,
+        ];
+
+        if (!empty($properties)) {
+            $payload["properties"] = $this->formatProperties($properties);
+        }
+
+        if (!empty($memberIds)) {
+            $payload["members"] = array_map(
+                function ($value) {
+                    return (string) $value;
+                },
+                $memberIds
+            );
+        }
+
+        $body = $this->streamFactory->createStream(json_encode($payload));
 
         $response = $this->http->sendRequest(
             $this->withAuthentication(
@@ -296,6 +407,7 @@ final class Client
                         "POST",
                         new Uri("{$this->rootUrl}/accounts/upsert")
                     )
+                    ->withHeader("content-type", "application/json")
                     ->withBody($body)
             )
         );
@@ -306,10 +418,11 @@ final class Client
             return $result;
         }
 
-        $json = json_decode($response->getBody(), true);
+        $response->getBody()->rewind();
+        $json = json_decode($response->getBody()->getContents(), true);
 
-        if ($response->getStatusCode() === 200) {
-            return new Result(
+        if ($response->getStatusCode() === 201) {
+            return new CallResult(
                 true,
                 false,
                 $this->getRemainingRequests($response),
@@ -319,12 +432,12 @@ final class Client
             );
         }
 
-        return new Result(
+        return new CallResult(
             false,
             false,
             $this->getRemainingRequests($response),
             $this->getMaxRequests($response),
-            $json['errors'],
+            $json['errors'] ?: [],
             null
         );
     }
