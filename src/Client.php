@@ -201,48 +201,29 @@ final class Client
         );
     }
 
-    public function addUserEvent(string $name, string $userId): CallResult
+    public function addEvent(Event $event): CallResult
     {
-        return $this->addEvent($name, $userId);
-    }
-
-    public function addAccountEvent(string $name, string $accountId, string $userId = null): CallResult
-    {
-        return $this->addEvent($name, $userId, $accountId);
-    }
-
-    private function addEvent(string $name, string $userId = null, string $accountId = null): CallResult
-    {
-        if (empty($name)) {
-            throw new InvalidArgumentException("Event name cannot be empty!");
-        }
-
-        if (preg_match("/^[a-z_]+$/", $name, $matches) === 0) {
-            throw new InvalidArgumentException("Event names need to be lowercase with underscores!");
-        }
-
-        if (empty($userId) && empty($accountId)) {
-            throw new InvalidArgumentException("At least one identifier needs to be set!");
-        }
-
         $identification = [];
 
-        if ($userId) {
-            $identification["userId"] = $userId;
+        if ($event->getUserId()) {
+            $identification["userId"] = $event->getUserId();
         }
 
-        if ($accountId) {
-            $identification["accountId"] = $accountId;
+        if ($event->getAccountId()) {
+            $identification["accountId"] = $event->getAccountId();
         }
 
-        $body = $this->streamFactory->createStream(
-            json_encode(
-                array(
-                    'name' => $name,
-                    'identification' => $identification,
-                )
-            )
-        );
+        $payload = [
+            'name' => $event->getName(),
+            'identification' => $identification,
+        ];
+
+        $recordedAt = $event->getRecordedAt();
+        if ($recordedAt instanceof DateTimeInterface) {
+            $payload["recordedAt"] = $recordedAt->format(DATE_ATOM);
+        }
+
+        $body = $this->streamFactory->createStream(json_encode($payload));
 
         $response = $this->http->sendRequest(
             $this->withAuthentication(

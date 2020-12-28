@@ -35,8 +35,6 @@ If you don't have an account yet, you can create one in [journy.io](https://app.
 Go to your settings, under the *Connections*-tab, to create and edit API keys. Make sure to give the correct permissions to the API Key.
 
 ```php
-<?php
-
 use JournyIO\SDK\Client;
 
 $client = Client::withDefaults("your-api-key");
@@ -45,13 +43,17 @@ $client = Client::withDefaults("your-api-key");
 If you want to use your own HTTP client (PSR-18):
 
 ```php
+use Buzz\Client\Curl;
+use JournyIO\SDK\Client;
+use Nyholm\Psr7\Factory\Psr17Factory;
+
 // https://github.com/Nyholm/psr7
-$factory = new \Nyholm\Psr7\Factory\Psr17Factory();
+$factory = new Psr17Factory();
 
 // https://github.com/kriswallsmith/Buzz
-$http = new \Buzz\Client\Curl($factory, ["timeout" => 5]);
+$http = new Curl($factory, ["timeout" => 5]);
 
-new \JournyIO\SDK\Client($http, $factory, $factory, ["apiKey" => "key"]);
+$client = new Client($http, $factory, $factory, ["apiKey" => "your-api-key"]);
 ```
 
 ### Methods
@@ -59,12 +61,14 @@ new \JournyIO\SDK\Client($http, $factory, $factory, ["apiKey" => "key"]);
 #### Get API key details
 
 ```php
+use JournyIO\SDK\ApiKeyDetails;
+
 $call = $client->getApiKeyDetails();
 
 if ($call->succeeded()) {
     $result = $call->result();
 
-    if ($result instanceof \JournyIO\SDK\ApiKeyDetails) {
+    if ($result instanceof ApiKeyDetails) {
         var_dump($result->getPermissions()); // string[]
     }
 } else {
@@ -75,12 +79,14 @@ if ($call->succeeded()) {
 #### Get tracking snippet for domain
 
 ```php
+use JournyIO\SDK\TrackingSnippet;
+
 $call = $client->getTrackingSnippet("blog.acme.com");
 
 if ($call->succeeded()) {
     $result = $call->result();
 
-    if ($result instanceof \JournyIO\SDK\TrackingSnippet) {
+    if ($result instanceof TrackingSnippet) {
         var_dump($result->getSnippet()); // string
         var_dump($result->getDomain()); // string
     }
@@ -92,13 +98,17 @@ if ($call->succeeded()) {
 #### Create or update user
 
 ```php
-$call = $client->upsertUser("userId", "name@domain.tld", [
-    "plan" => "Pro",
-    "age" => 26,
-    "is_developer" => true,
-    "registered_at" => new DateTimeImmutable("..."),
-    "this_property_will_be_deleted" => "",
-]);
+$call = $client->upsertUser(
+    "userId",
+    "name@domain.tld",
+    [
+        "plan" => "Pro",
+        "age" => 26,
+        "is_developer" => true,
+        "registered_at" => new DateTimeImmutable("..."),
+        "this_property_will_be_deleted" => "",
+    ]
+);
 ```
 
 #### Create or update account
@@ -113,27 +123,24 @@ $call = $client->upsertAccount(
         "plan" => "Pro",
         "age" => 26,
         "is_developer" => true,
-        "registered_at" => new DateTimeImmutable("..."),
+        "registered_at" => new \DateTimeImmutable("..."),
         "this_property_will_be_deleted" => "",
     ],
     $members
 );
 ```
 
-#### Add event for user
+#### Add event
 
 ```php
-$call = $client->addUserEvent("login", "userId");
-```
+use JournyIO\SDK\Event;
 
-#### Add event for account
+$event = Event::forUser("login", "userId");
+$event = Event::forUser("some_historic_event", "userId")->happenedAt(new \DateTimeImmutable("now"));
+$event = Event::forAccount("reached_monthly_volume", "accountId");
+$event = Event::forUserInAccount("updated_settings", "userId", "accountId");
 
-```php
-$call = $client->addAccountEvent("reached_monthly_volume", "accountId");
-```
-
-```php
-$call = $client->addAccountEvent("updated_settings", "accountId", "userId");
+$call = $client->addEvent($event);
 ```
 
 ### Handling errors
