@@ -98,7 +98,7 @@ if ($call->succeeded()) {
 #### Create or update user
 
 ```php
-$call = $client->upsertUser(
+$call = $client->upsertAppUser(
     "userId",
     "name@domain.tld",
     [
@@ -116,7 +116,7 @@ $call = $client->upsertUser(
 ```php
 $members = ["userId", "userId"];
 
-$call = $client->upsertAccount(
+$call = $client->upsertAppAccount(
     "accountId",
     "name",
     [
@@ -133,12 +133,12 @@ $call = $client->upsertAccount(
 #### Add event
 
 ```php
-use JournyIO\SDK\Event;
+use JournyIO\SDK\AppEvent;
 
-$event = Event::forUser("login", "userId");
-$event = Event::forUser("some_historic_event", "userId")->happenedAt(new \DateTimeImmutable("now"));
-$event = Event::forAccount("reached_monthly_volume", "accountId");
-$event = Event::forUserInAccount("updated_settings", "userId", "accountId");
+$event = AppEvent::forUser("login", "userId");
+$event = AppEvent::forUser("some_historic_event", "userId")->happenedAt(new \DateTimeImmutable("now"));
+$event = AppEvent::forAccount("reached_monthly_volume", "accountId");
+$event = AppEvent::forUserInAccount("updated_settings", "userId", "accountId");
 
 $call = $client->addEvent($event);
 ```

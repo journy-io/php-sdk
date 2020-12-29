@@ -130,7 +130,7 @@ class ClientTest extends TestCase
 
         $this->assertEquals(
             new CallResult(true, false, 0, 0, [], null),
-            $client->upsertUser(
+            $client->upsertAppUser(
                 "1",
                 "hans@journy.io",
                 [
@@ -175,7 +175,7 @@ class ClientTest extends TestCase
 
         $this->assertEquals(
             new CallResult(true, false, 0, 0, [], null),
-            $client->upsertAccount(
+            $client->upsertAppAccount(
                 "1",
                 "journy.io",
                 [
@@ -220,7 +220,7 @@ class ClientTest extends TestCase
 
         $this->assertEquals(
             new CallResult(true, false, 0, 0, [], null),
-            $client->addEvent(Event::forUser("login", "1"))
+            $client->addEvent(AppEvent::forUser("login", "1"))
         );
 
         $request = $http->getLastRequest();
@@ -251,7 +251,7 @@ class ClientTest extends TestCase
 
         $this->assertEquals(
             new CallResult(true, false, 0, 0, [], null),
-            $client->addEvent(Event::forUser("login", "1")->happenedAt($now))
+            $client->addEvent(AppEvent::forUser("login", "1")->happenedAt($now))
         );
 
         $request = $http->getLastRequest();
@@ -282,7 +282,7 @@ class ClientTest extends TestCase
 
         $this->assertEquals(
             new CallResult(true, false, 0, 0, [], null),
-            $client->addEvent(Event::forAccount("login", "1"))
+            $client->addEvent(AppEvent::forAccount("login", "1"))
         );
 
         $request = $http->getLastRequest();
@@ -312,7 +312,7 @@ class ClientTest extends TestCase
 
         $this->assertEquals(
             new CallResult(true, false, 0, 0, [], null),
-            $client->addEvent(Event::forUserInAccount("login", "1", "1"))
+            $client->addEvent(AppEvent::forUserInAccount("login", "1", "1"))
         );
 
         $request = $http->getLastRequest();
@@ -342,7 +342,7 @@ class ClientTest extends TestCase
 
         $this->assertEquals(
             new CallResult(false, false, 0, 0, ["something unexpected happened"], null),
-            $client->addEvent(Event::forUser("login", "1"))
+            $client->addEvent(AppEvent::forUser("login", "1"))
         );
     }
 
@@ -355,7 +355,7 @@ class ClientTest extends TestCase
 
         $this->assertEquals(
             new CallResult(false, false, 0, 0, ['You are not authorized to \'GET\' the path \'/tracking/snippet\' with this API Key. You need the permission: GetTrackingSnippet.'], null),
-            $client->addEvent(Event::forUser("login", "1"))
+            $client->addEvent(AppEvent::forUser("login", "1"))
         );
     }
 
@@ -368,7 +368,7 @@ class ClientTest extends TestCase
 
         $this->assertEquals(
             new CallResult(true, false, 1999, 2000, [], null),
-            $client->addEvent(Event::forUser("login", "1"))
+            $client->addEvent(AppEvent::forUser("login", "1"))
         );
     }
 
@@ -381,7 +381,7 @@ class ClientTest extends TestCase
 
         $this->assertEquals(
             new CallResult(false, true, 0, 0, ["rate limited"], null),
-            $client->addEvent(Event::forUser("login", "1"))
+            $client->addEvent(AppEvent::forUser("login", "1"))
         );
     }
 }

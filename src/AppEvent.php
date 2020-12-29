@@ -5,7 +5,7 @@ namespace JournyIO\SDK;
 use DateTimeInterface;
 use InvalidArgumentException;
 
-final class Event
+final class AppEvent
 {
     private $name;
     private $userId;
@@ -24,9 +24,9 @@ final class Event
         $this->recordedAt = $recordedAt ? clone $recordedAt : null;
     }
 
-    public function happenedAt(DateTimeInterface $time): Event
+    public function happenedAt(DateTimeInterface $time): AppEvent
     {
-        return new Event(
+        return new AppEvent(
             $this->name,
             $this->userId,
             $this->accountId,
@@ -34,25 +34,25 @@ final class Event
         );
     }
 
-    public static function forUser(string $name, string $userId): Event
+    public static function forUser(string $name, string $userId): AppEvent
     {
         if (empty($userId)) {
             throw new InvalidArgumentException("User ID cannot be empty!");
         }
 
-        return new Event($name, $userId);
+        return new AppEvent($name, $userId);
     }
 
-    public static function forAccount(string $name, string $accountId): Event
+    public static function forAccount(string $name, string $accountId): AppEvent
     {
         if (empty($accountId)) {
             throw new InvalidArgumentException("Account ID cannot be empty!");
         }
 
-        return new Event($name, null, $accountId);
+        return new AppEvent($name, null, $accountId);
     }
 
-    public static function forUserInAccount(string $name, string $userId, string $accountId): Event
+    public static function forUserInAccount(string $name, string $userId, string $accountId): AppEvent
     {
         if (empty($userId)) {
             throw new InvalidArgumentException("User ID cannot be empty!");
@@ -62,7 +62,7 @@ final class Event
             throw new InvalidArgumentException("Account ID cannot be empty!");
         }
 
-        return new Event($name, $userId, $accountId);
+        return new AppEvent($name, $userId, $accountId);
     }
 
     public function getName()

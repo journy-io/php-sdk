@@ -201,7 +201,7 @@ final class Client
         );
     }
 
-    public function addEvent(Event $event): CallResult
+    public function addEvent(AppEvent $event): CallResult
     {
         $identification = [];
 
@@ -288,7 +288,7 @@ final class Client
         return $formatted;
     }
 
-    public function upsertUser(string $id, string $email, array $properties = []): CallResult
+    public function upsertAppUser(string $id, string $email, array $properties = []): CallResult
     {
         if (empty($id)) {
             throw new InvalidArgumentException("User ID cannot be empty!");
@@ -351,14 +351,14 @@ final class Client
         );
     }
 
-    public function upsertAccount(string $id, string $name, array $properties = [], array $memberIds = null): CallResult
+    public function upsertAppAccount(string $id, string $name, array $properties = [], array $memberIds = null): CallResult
     {
         if (empty($id)) {
             throw new InvalidArgumentException("Account ID cannot be empty!");
         }
 
         if (empty($name)) {
-            throw new InvalidArgumentException("Name cannot be empty!");
+            throw new InvalidArgumentException("Account name cannot be empty!");
         }
 
         $payload = [
