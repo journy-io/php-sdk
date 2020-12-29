@@ -351,8 +351,12 @@ final class Client
         );
     }
 
-    public function upsertAppAccount(string $id, string $name, array $properties = [], array $memberIds = null): CallResult
-    {
+    public function upsertAppAccount(
+        string $id,
+        string $name,
+        array $properties = [],
+        array $memberIds = null
+    ): CallResult {
         if (empty($id)) {
             throw new InvalidArgumentException("Account ID cannot be empty!");
         }
