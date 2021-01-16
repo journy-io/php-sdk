@@ -2,6 +2,8 @@
 
 # journy.io PHP SDK
 
+![npm](https://img.shields.io/packagist/v/journy-io/sdk?color=%234d84f5&style=flat-square)
+
 This is the official PHP SDK for [journy.io](https://journy.io?utm_source=github&utm_content=readme-php-sdk).
 
 ## 💾 Installation
