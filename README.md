@@ -28,9 +28,9 @@ composer require kriswallsmith/buzz nyholm/psr7
 
 ### Configuration
 
-To be able to use the SDK you need to generate an API key. If you don't have one you can create one in [journy.io](https://app.journy.io?utm_source=github&utm_content=readme-php-sdk).
+To be able to use the SDK you need to generate an API key. If you don't have one you can create one in [journy.io](https://system.journy.io?utm_source=github&utm_content=readme-php-sdk).
 
-If you don't have an account yet, you can create one in [journy.io](https://app.journy.io/register?utm_source=github&utm_content=readme-php-sdk) or [request a demo first](https://www.journy.io/book-demo?utm_source=github&utm_content=readme-php-sdk).
+If you don't have an account yet, you can create one in [journy.io](https://system.journy.io/register?utm_source=github&utm_content=readme-php-sdk) or [request a demo first](https://www.journy.io/book-demo?utm_source=github&utm_content=readme-php-sdk).
 
 Go to your settings, under the *Connections*-tab, to create and edit API keys. Make sure to give the correct permissions to the API Key.
 
@@ -97,6 +97,8 @@ if ($call->succeeded()) {
 
 #### Create or update user
 
+_Note: when sending an empty value (`""`) as value for a property, the property will be deleted._
+
 ```php
 $call = $client->upsertAppUser(
     "userId",
@@ -112,6 +114,8 @@ $call = $client->upsertAppUser(
 ```
 
 #### Create or update account
+
+_Note: when sending an empty value (`""`) as value for a property, the property will be deleted._
 
 ```php
 $members = ["userId", "userId"];
@@ -145,7 +149,7 @@ $call = $client->addEvent($event);
 
 ### Handling errors
 
-Every call will return a result, we don't throw errors when a call fails. We don't want to break your application when things go wrong.
+Every call will return a result, we don't throw errors when a call fails. We don't want to break your application when things go wrong. An exception will be thrown for required arguments that are empty or missing.
 
 ```php
 $call = $client->getTrackingSnippet("blog.acme.com");
