@@ -173,9 +173,9 @@ composer run test
 
 We welcome your feedback, ideas and suggestions. We really want to make your life easier, so if we’re falling short or should be doing something different, we want to hear about it.
 
-## 🔒 Security
-
 Please create an issue or contact us via the chat on our website.
+
+## 🔒 Security
 
 If you discover any security related issues, please email hans at journy io instead of using the issue tracker.
 
