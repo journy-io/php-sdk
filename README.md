@@ -157,9 +157,9 @@ var_dump($call->maxRequests()); // int
 var_dump($call->errors()); // array
 ```
 
-## 📬 API
+## 📬 API Docs
 
-More documentation and information about our API can be found in the [API documentation](https://journy-io.readme.io/reference).
+[API reference](https://developers.journy.io)
 
 ## 💯 Tests
 
@@ -173,4 +173,9 @@ composer run test
 
 We welcome your feedback, ideas and suggestions. We really want to make your life easier, so if we’re falling short or should be doing something different, we want to hear about it.
 
+## 🔒 Security
+
 Please create an issue or contact us via the chat on our website.
+
+If you discover any security related issues, please email hans at journy io instead of using the issue tracker.
+
