@@ -2,6 +2,8 @@
 
 # journy.io PHP SDK
 
+![npm](https://img.shields.io/packagist/v/journy-io/sdk?color=%234d84f5&style=flat-square)
+
 This is the official PHP SDK for [journy.io](https://journy.io?utm_source=github&utm_content=readme-php-sdk).
 
 ## 💾 Installation
@@ -28,9 +30,9 @@ composer require kriswallsmith/buzz nyholm/psr7
 
 ### Configuration
 
-To be able to use the SDK you need to generate an API key. If you don't have one you can create one in [journy.io](https://app.journy.io?utm_source=github&utm_content=readme-php-sdk).
+To be able to use the SDK you need to generate an API key. If you don't have one you can create one in [journy.io](https://system.journy.io?utm_source=github&utm_content=readme-php-sdk).
 
-If you don't have an account yet, you can create one in [journy.io](https://app.journy.io/register?utm_source=github&utm_content=readme-php-sdk) or [request a demo first](https://www.journy.io/book-demo?utm_source=github&utm_content=readme-php-sdk).
+If you don't have an account yet, you can create one in [journy.io](https://system.journy.io/register?utm_source=github&utm_content=readme-php-sdk) or [request a demo first](https://www.journy.io/book-demo?utm_source=github&utm_content=readme-php-sdk).
 
 Go to your settings, under the *Connections*-tab, to create and edit API keys. Make sure to give the correct permissions to the API Key.
 
@@ -97,6 +99,8 @@ if ($call->succeeded()) {
 
 #### Create or update user
 
+_Note: when sending an empty value (`""`) as value for a property, the property will be deleted._
+
 ```php
 $call = $client->upsertAppUser(
     "userId",
@@ -112,6 +116,8 @@ $call = $client->upsertAppUser(
 ```
 
 #### Create or update account
+
+_Note: when sending an empty value (`""`) as value for a property, the property will be deleted._
 
 ```php
 $members = ["userId", "userId"];
@@ -165,7 +171,7 @@ $call = $client->addEvent($event);
 
 ### Handling errors
 
-Every call will return a result, we don't throw errors when a call fails. We don't want to break your application when things go wrong.
+Every call will return a result, we don't throw errors when a call fails. We don't want to break your application when things go wrong. An exception will be thrown for required arguments that are empty or missing.
 
 ```php
 $call = $client->getTrackingSnippet("blog.acme.com");
@@ -177,9 +183,9 @@ var_dump($call->maxRequests()); // int
 var_dump($call->errors()); // array
 ```
 
-## 📬 API
+## 📬 API Docs
 
-More documentation and information about our API can be found in the [API documentation](https://journy-io.readme.io/reference).
+[API reference](https://developers.journy.io)
 
 ## 💯 Tests
 
@@ -194,3 +200,8 @@ composer run test
 We welcome your feedback, ideas and suggestions. We really want to make your life easier, so if we’re falling short or should be doing something different, we want to hear about it.
 
 Please create an issue or contact us via the chat on our website.
+
+## 🔒 Security
+
+If you discover any security related issues, please email hans at journy io instead of using the issue tracker.
+
