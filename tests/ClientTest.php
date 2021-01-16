@@ -241,6 +241,35 @@ class ClientTest extends TestCase
         }
     }
 
+    public function test_it_links_web_visitor_with_app_user()
+    {
+        $factory = new Psr17Factory();
+        $json = '{"message":"The data is correctly stored.","meta":{"status":201,"requestId":"01ETG3HQ4JY4HNNZ84FBJM3CSC"}}';
+        $http = new HttpClientFixed(new Response(201, [], $json));
+        $client = new Client($http, $factory, $factory, ["apiKey" => "key"]);
+        $now = new DateTimeImmutable("now");
+
+        $this->assertEquals(
+            new CallResult(true, false, 0, 0, [], null),
+            $client->link("deviceId", "userId")
+        );
+
+        $request = $http->getLastRequest();
+        $this->assertInstanceOf(RequestInterface::class, $request);
+        if ($request instanceof RequestInterface) {
+            $request->getBody()->rewind();
+            $body = $request->getBody()->getContents();
+            $payload = json_decode($body, true);
+            $this->assertEquals(
+                [
+                    "deviceId" => "deviceId",
+                    "userId" => "userId",
+                ],
+                $payload
+            );
+        }
+    }
+
     public function test_it_triggers_event_for_user_with_date()
     {
         $factory = new Psr17Factory();

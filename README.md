@@ -130,6 +130,26 @@ $call = $client->upsertAppAccount(
 );
 ```
 
+#### Link web visitor to an app user
+
+You can link a web visitor to a user in your application when you have our snippet installed on your website. The snippet sets a cookie named `__journey`. If the cookie exists, you can link the web visitor to the user that is currently logged in:
+
+```php
+/** @var Psr\Http\Message\ServerRequestInterface $request */
+$cookies = $request->cookieParams();
+$deviceId = $cookies["__journey"];
+
+/** @var Illuminate\Http\Request $request */
+$deviceId = $request->cookie("__journey");
+
+/** @var Symfony\Component\HttpFoundation\Request $request */
+$deviceId = $request->cookies->get("__journey");
+
+if ($deviceId) {
+  $call = $client->link($deviceId, "userId");
+}
+```
+
 #### Add event
 
 ```php

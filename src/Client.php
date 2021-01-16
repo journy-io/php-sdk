@@ -267,6 +267,65 @@ final class Client
         );
     }
 
+    public function link(string $deviceId, string $userId): CallResult
+    {
+        if (empty($deviceId)) {
+            throw new InvalidArgumentException("Device ID cannot be empty!");
+        }
+
+        if (empty($userId)) {
+            throw new InvalidArgumentException("User ID cannot be empty!");
+        }
+
+        $payload = [
+            "deviceId" => $deviceId,
+            "userId" => $userId,
+        ];
+
+        $body = $this->streamFactory->createStream(json_encode($payload));
+
+        $response = $this->http->sendRequest(
+            $this->withAuthentication(
+                $this->requestFactory
+                    ->createRequest(
+                        "POST",
+                        new Uri("{$this->rootUrl}/link")
+                    )
+                    ->withHeader("content-type", "application/json")
+                    ->withBody($body)
+            )
+        );
+
+        $result = $this->check($response);
+
+        if ($result) {
+            return $result;
+        }
+
+        $response->getBody()->rewind();
+        $json = json_decode($response->getBody()->getContents(), true);
+
+        if ($response->getStatusCode() === 201) {
+            return new CallResult(
+                true,
+                false,
+                $this->getRemainingRequests($response),
+                $this->getMaxRequests($response),
+                [],
+                null
+            );
+        }
+
+        return new CallResult(
+            false,
+            false,
+            $this->getRemainingRequests($response),
+            $this->getMaxRequests($response),
+            $json['errors'] ?: [],
+            null
+        );
+    }
+
     private function formatProperties(array $properties)
     {
         $formatted = array();
