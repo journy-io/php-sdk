@@ -39,6 +39,7 @@ Go to your settings, under the *Connections*-tab, to create and edit API keys. M
 ```php
 use JournyIO\SDK\Client;
 
+// composer require kriswallsmith/buzz nyholm/psr7
 $client = Client::withDefaults("your-api-key");
 ```
 
