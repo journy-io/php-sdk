@@ -131,13 +131,15 @@ class ClientTest extends TestCase
         $this->assertEquals(
             new CallResult(true, false, 0, 0, [], null),
             $client->upsertAppUser(
-                "1",
-                "hans@journy.io",
                 [
-                    "string" => "string",
-                    "boolean" => true,
-                    "number" => 22,
-                    "date" => $now,
+                    "userId" => "1",
+                    "email" => "hans@journy.io",
+                    "properties" => [
+                        "string" => "string",
+                        "boolean" => true,
+                        "number" => 22,
+                        "date" => $now,
+                    ],
                 ]
             )
         );
@@ -176,15 +178,17 @@ class ClientTest extends TestCase
         $this->assertEquals(
             new CallResult(true, false, 0, 0, [], null),
             $client->upsertAppAccount(
-                "1",
-                "journy.io",
                 [
-                    "string" => "string",
-                    "boolean" => true,
-                    "number" => 22,
-                    "date" => $now,
-                ],
-                ["1", "2"]
+                    "accountId" => "1",
+                    "name" => "journy.io",
+                    "properties" => [
+                        "string" => "string",
+                        "boolean" => true,
+                        "number" => 22,
+                        "date" => $now,
+                    ],
+                    "members" => ["1", "2"],
+                ]
             )
         );
 

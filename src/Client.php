@@ -347,23 +347,23 @@ final class Client
         return $formatted;
     }
 
-    public function upsertAppUser(string $id, string $email, array $properties = []): CallResult
+    public function upsertAppUser(array $user): CallResult
     {
-        if (empty($id)) {
+        if (!isset($user["userId"]) || empty($user["userId"])) {
             throw new InvalidArgumentException("User ID cannot be empty!");
         }
 
-        if (empty($email)) {
-            throw new InvalidArgumentException("Email cannot be empty!");
+        if (!isset($user["email"]) || empty($user["email"])) {
+            throw new InvalidArgumentException("User email cannot be empty!");
         }
 
         $payload = [
-            "userId" => $id,
-            "email" => $email,
+            "userId" => (string) $user["userId"],
+            "email" => (string) $user["email"],
         ];
 
-        if (!empty($properties)) {
-            $payload["properties"] = $this->formatProperties($properties);
+        if (isset($user["properties"]) && is_array($user["properties"])) {
+            $payload["properties"] = $this->formatProperties($user["properties"]);
         }
 
         $body = $this->streamFactory->createStream(json_encode($payload));
@@ -410,35 +410,31 @@ final class Client
         );
     }
 
-    public function upsertAppAccount(
-        string $id,
-        string $name,
-        array $properties = [],
-        array $memberIds = null
-    ): CallResult {
-        if (empty($id)) {
+    public function upsertAppAccount(array $account): CallResult
+    {
+        if (!isset($account["accountId"]) || empty($account["accountId"])) {
             throw new InvalidArgumentException("Account ID cannot be empty!");
         }
 
-        if (empty($name)) {
+        if (!isset($account["name"]) || empty($account["name"])) {
             throw new InvalidArgumentException("Account name cannot be empty!");
         }
 
         $payload = [
-            "accountId" => $id,
-            "name" => $name,
+            "accountId" => (string) $account["accountId"],
+            "name" => (string) $account["name"],
         ];
 
-        if (!empty($properties)) {
-            $payload["properties"] = $this->formatProperties($properties);
+        if (isset($account["properties"]) && is_array($account["properties"])) {
+            $payload["properties"] = $this->formatProperties($account["properties"]);
         }
 
-        if (is_array($memberIds)) {
+        if (isset($account["members"]) && is_array($account["members"])) {
             $payload["members"] = array_map(
                 function ($value) {
                     return (string) $value;
                 },
-                $memberIds
+                $account["members"]
             );
         }
 

@@ -102,17 +102,20 @@ if ($call->succeeded()) {
 _Note: when sending an empty value (`""`) as value for a property, the property will be deleted._
 
 ```php
-$call = $client->upsertAppUser(
-    "userId",
-    "name@domain.tld",
-    [
+$call = $client->upsertAppUser([
+    // required
+    "userId" => "userId",
+    "email" => "name@domain.tld",
+
+    // optional
+    "properties" => [
         "plan" => "Pro",
         "age" => 26,
         "is_developer" => true,
         "registered_at" => new DateTimeImmutable("..."),
         "this_property_will_be_deleted" => "",
-    ]
-);
+    ],
+]);
 ```
 
 #### Create or update account
@@ -120,20 +123,23 @@ $call = $client->upsertAppUser(
 _Note: when sending an empty value (`""`) as value for a property, the property will be deleted._
 
 ```php
-$members = ["userId", "userId"];
+$call = $client->upsertAppAccount([
+    // required
+    "accountId" => "accountId",
+    "name" => "Name",
 
-$call = $client->upsertAppAccount(
-    "accountId",
-    "name",
-    [
+    // optional
+    "properties" => [
         "plan" => "Pro",
         "age" => 26,
         "is_developer" => true,
         "registered_at" => new \DateTimeImmutable("..."),
         "this_property_will_be_deleted" => "",
     ],
-    $members
-);
+
+    // optional
+    "members" => ["userId", "userId"],
+]);
 ```
 
 #### Link web visitor to an app user
