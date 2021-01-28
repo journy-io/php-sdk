@@ -103,7 +103,7 @@ if ($call->succeeded()) {
 _Note: when sending an empty value (`""`) as value for a property, the property will be deleted._
 
 ```php
-$call = $client->upsertAppUser([
+$call = $client->upsertUser([
     // required
     "userId" => "userId",
     "email" => "name@domain.tld",
@@ -124,7 +124,7 @@ $call = $client->upsertAppUser([
 _Note: when sending an empty value (`""`) as value for a property, the property will be deleted._
 
 ```php
-$call = $client->upsertAppAccount([
+$call = $client->upsertAccount([
     // required
     "accountId" => "accountId",
     "name" => "Name",
@@ -143,7 +143,7 @@ $call = $client->upsertAppAccount([
 ]);
 ```
 
-#### Link web visitor to an app user
+#### Link web visitor to a user
 
 You can link a web visitor to a user in your application when you have our snippet installed on your website. The snippet sets a cookie named `__journey`. If the cookie exists, you can link the web visitor to the user that is currently logged in:
 
@@ -166,12 +166,16 @@ if ($deviceId) {
 #### Add event
 
 ```php
-use JournyIO\SDK\AppEvent;
+use JournyIO\SDK\Event;
 
-$event = AppEvent::forUser("login", "userId");
-$event = AppEvent::forUser("some_historic_event", "userId")->happenedAt(new \DateTimeImmutable("now"));
-$event = AppEvent::forAccount("reached_monthly_volume", "accountId");
-$event = AppEvent::forUserInAccount("updated_settings", "userId", "accountId");
+$event = Event::forUser("login", "userId");
+$event = Event::forUser("some_historic_event", "userId")->happenedAt(new \DateTimeImmutable("now"));
+$event = Event::forAccount("reached_monthly_volume", "accountId")->withMetadata([
+    "number" => 13313,
+    "string" => "string",
+    "boolean" => true,
+]);
+$event = Event::forUserInAccount("updated_settings", "userId", "accountId");
 
 $call = $client->addEvent($event);
 ```

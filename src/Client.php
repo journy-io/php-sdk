@@ -201,7 +201,7 @@ final class Client
         );
     }
 
-    public function addEvent(AppEvent $event): CallResult
+    public function addEvent(Event $event): CallResult
     {
         $identification = [];
 
@@ -221,6 +221,11 @@ final class Client
         $recordedAt = $event->getRecordedAt();
         if ($recordedAt instanceof DateTimeInterface) {
             $payload["recordedAt"] = $recordedAt->format(DATE_ATOM);
+        }
+
+        $metadata = $event->getMetadata();
+        if (!empty($metadata)) {
+            $payload["metadata"] = $this->formatMetadata($metadata);
         }
 
         $body = $this->streamFactory->createStream(json_encode($payload));
@@ -326,6 +331,27 @@ final class Client
         );
     }
 
+    private function formatMetadata(array $metadata)
+    {
+        $formatted = array();
+
+        foreach ($metadata as $name => $value) {
+            if (is_int($value) || is_float($value) || is_string($value)) {
+                $formatted[$name] = (string) $value;
+            }
+
+            if (is_bool($value)) {
+                $formatted[$name] = $value ? "true" : "false";
+            }
+
+            if ($value instanceof DateTimeInterface) {
+                $formatted[$name] = $value->format(DATE_ATOM);
+            }
+        }
+
+        return $formatted;
+    }
+
     private function formatProperties(array $properties)
     {
         $formatted = array();
@@ -347,7 +373,7 @@ final class Client
         return $formatted;
     }
 
-    public function upsertAppUser(array $user): CallResult
+    public function upsertUser(array $user): CallResult
     {
         if (!isset($user["userId"]) || empty($user["userId"])) {
             throw new InvalidArgumentException("User ID cannot be empty!");
@@ -410,7 +436,7 @@ final class Client
         );
     }
 
-    public function upsertAppAccount(array $account): CallResult
+    public function upsertAccount(array $account): CallResult
     {
         if (!isset($account["accountId"]) || empty($account["accountId"])) {
             throw new InvalidArgumentException("Account ID cannot be empty!");

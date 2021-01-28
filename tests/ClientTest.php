@@ -130,7 +130,7 @@ class ClientTest extends TestCase
 
         $this->assertEquals(
             new CallResult(true, false, 0, 0, [], null),
-            $client->upsertAppUser(
+            $client->upsertUser(
                 [
                     "userId" => "1",
                     "email" => "hans@journy.io",
@@ -177,7 +177,7 @@ class ClientTest extends TestCase
 
         $this->assertEquals(
             new CallResult(true, false, 0, 0, [], null),
-            $client->upsertAppAccount(
+            $client->upsertAccount(
                 [
                     "accountId" => "1",
                     "name" => "journy.io",
@@ -224,7 +224,7 @@ class ClientTest extends TestCase
 
         $this->assertEquals(
             new CallResult(true, false, 0, 0, [], null),
-            $client->addEvent(AppEvent::forUser("login", "1"))
+            $client->addEvent(Event::forUser("login", "1"))
         );
 
         $request = $http->getLastRequest();
@@ -245,7 +245,7 @@ class ClientTest extends TestCase
         }
     }
 
-    public function test_it_links_web_visitor_with_app_user()
+    public function test_it_links_web_visitor_with_user()
     {
         $factory = new Psr17Factory();
         $json = '{"message":"The data is correctly stored.","meta":{"status":201,"requestId":"01ETG3HQ4JY4HNNZ84FBJM3CSC"}}';
@@ -284,7 +284,7 @@ class ClientTest extends TestCase
 
         $this->assertEquals(
             new CallResult(true, false, 0, 0, [], null),
-            $client->addEvent(AppEvent::forUser("login", "1")->happenedAt($now))
+            $client->addEvent(Event::forUser("login", "1")->happenedAt($now))
         );
 
         $request = $http->getLastRequest();
@@ -306,6 +306,48 @@ class ClientTest extends TestCase
         }
     }
 
+    public function test_it_triggers_event_for_user_with_metadata()
+    {
+        $factory = new Psr17Factory();
+        $json = '{"message":"The data is correctly stored.","meta":{"status":201,"requestId":"01ETG3HQ4JY4HNNZ84FBJM3CSC"}}';
+        $http = new HttpClientFixed(new Response(201, [], $json));
+        $client = new Client($http, $factory, $factory, ["apiKey" => "key"]);
+        $now = new DateTimeImmutable("now");
+
+        $this->assertEquals(
+            new CallResult(true, false, 0, 0, [], null),
+            $client->addEvent(
+                Event::forUser("login", "1")->withMetadata([
+                    "number" => 1,
+                    "string" => "string",
+                    "boolean" => false,
+                ])
+            )
+        );
+
+        $request = $http->getLastRequest();
+        $this->assertInstanceOf(RequestInterface::class, $request);
+        if ($request instanceof RequestInterface) {
+            $request->getBody()->rewind();
+            $body = $request->getBody()->getContents();
+            $payload = json_decode($body, true);
+            $this->assertEquals(
+                [
+                    "name" => "login",
+                    "identification" => [
+                        "userId" => "1",
+                    ],
+                    "metadata" => [
+                        "number" => "1",
+                        "string" => "string",
+                        "boolean" => "false",
+                    ],
+                ],
+                $payload
+            );
+        }
+    }
+
     public function test_it_triggers_event_for_account()
     {
         $factory = new Psr17Factory();
@@ -315,7 +357,7 @@ class ClientTest extends TestCase
 
         $this->assertEquals(
             new CallResult(true, false, 0, 0, [], null),
-            $client->addEvent(AppEvent::forAccount("login", "1"))
+            $client->addEvent(Event::forAccount("login", "1"))
         );
 
         $request = $http->getLastRequest();
@@ -345,7 +387,7 @@ class ClientTest extends TestCase
 
         $this->assertEquals(
             new CallResult(true, false, 0, 0, [], null),
-            $client->addEvent(AppEvent::forUserInAccount("login", "1", "1"))
+            $client->addEvent(Event::forUserInAccount("login", "1", "1"))
         );
 
         $request = $http->getLastRequest();
@@ -375,7 +417,7 @@ class ClientTest extends TestCase
 
         $this->assertEquals(
             new CallResult(false, false, 0, 0, ["something unexpected happened"], null),
-            $client->addEvent(AppEvent::forUser("login", "1"))
+            $client->addEvent(Event::forUser("login", "1"))
         );
     }
 
@@ -388,7 +430,7 @@ class ClientTest extends TestCase
 
         $this->assertEquals(
             new CallResult(false, false, 0, 0, ['You are not authorized to \'GET\' the path \'/tracking/snippet\' with this API Key. You need the permission: GetTrackingSnippet.'], null),
-            $client->addEvent(AppEvent::forUser("login", "1"))
+            $client->addEvent(Event::forUser("login", "1"))
         );
     }
 
@@ -401,7 +443,7 @@ class ClientTest extends TestCase
 
         $this->assertEquals(
             new CallResult(true, false, 1999, 2000, [], null),
-            $client->addEvent(AppEvent::forUser("login", "1"))
+            $client->addEvent(Event::forUser("login", "1"))
         );
     }
 
@@ -414,7 +456,7 @@ class ClientTest extends TestCase
 
         $this->assertEquals(
             new CallResult(false, true, 0, 0, ["rate limited"], null),
-            $client->addEvent(AppEvent::forUser("login", "1"))
+            $client->addEvent(Event::forUser("login", "1"))
         );
     }
 }
