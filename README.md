@@ -105,7 +105,7 @@ _Note: when sending an empty value (`""`) as value for a property, the property 
 ```php
 $call = $client->upsertUser([
     // required
-    "userId" => "userId",
+    "userId" => "userId", // Unique identifier for the user in your database
     "email" => "name@domain.tld",
 
     // optional
@@ -126,7 +126,7 @@ _Note: when sending an empty value (`""`) as value for a property, the property 
 ```php
 $call = $client->upsertAccount([
     // required
-    "accountId" => "accountId",
+    "accountId" => "accountId", // Unique identifier for the account in your database
     "name" => "Name",
 
     // optional
@@ -139,7 +139,7 @@ $call = $client->upsertAccount([
     ],
 
     // optional
-    "members" => ["userId", "userId"],
+    "members" => ["userId", "userId"], // Unique identifier for the user in your database
 ]);
 ```
 
