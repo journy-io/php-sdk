@@ -26,8 +26,7 @@ final class Client
         RequestFactoryInterface $requestFactory,
         StreamFactoryInterface $streamFactory,
         array $config
-    )
-    {
+    ) {
         if (empty($config)) {
             throw new InvalidArgumentException("Configuration cannot be empty!");
         }
