@@ -153,8 +153,10 @@ class ClientTest extends TestCase
             $payload = json_decode($body, true);
             $this->assertEquals(
                 [
-                    "userId" => "1",
-                    "email" => "hans@journy.io",
+                    "identification" => [
+                        "userId" => "1",
+                        "email" => "hans@journy.io",
+                    ],
                     "properties" => [
                         "string" => "string",
                         "boolean" => "true",
@@ -200,7 +202,9 @@ class ClientTest extends TestCase
             $payload = json_decode($body, true);
             $this->assertEquals(
                 [
-                    "accountId" => "1",
+                    "identification" => [
+                        "accountId" => "1"
+                    ],
                     "name" => "journy.io",
                     "properties" => [
                         "string" => "string",
@@ -237,7 +241,9 @@ class ClientTest extends TestCase
                 [
                     "name" => "login",
                     "identification" => [
-                        "userId" => "1",
+                        "user" => [
+                            "userId" => "1"
+                        ],
                     ],
                 ],
                 $payload
@@ -267,7 +273,9 @@ class ClientTest extends TestCase
             $this->assertEquals(
                 [
                     "deviceId" => "deviceId",
-                    "userId" => "userId",
+                    "identification" => [
+                        "userId" => "userId"
+                    ],
                 ],
                 $payload
             );
@@ -297,7 +305,9 @@ class ClientTest extends TestCase
                 [
                     "name" => "login",
                     "identification" => [
-                        "userId" => "1",
+                        "user" => [
+                            "userId" => "1"
+                        ],
                     ],
                     "recordedAt" => $now->format(DATE_ATOM),
                 ],
@@ -335,7 +345,9 @@ class ClientTest extends TestCase
                 [
                     "name" => "login",
                     "identification" => [
-                        "userId" => "1",
+                        "user" => [
+                            "userId" => "1"
+                        ],
                     ],
                     "metadata" => [
                         "number" => "1",
@@ -370,7 +382,9 @@ class ClientTest extends TestCase
                 [
                     "name" => "login",
                     "identification" => [
-                        "accountId" => "1",
+                        "account" => [
+                            "accountId" => "1"
+                        ]
                     ],
                 ],
                 $payload
@@ -400,8 +414,12 @@ class ClientTest extends TestCase
                 [
                     "name" => "login",
                     "identification" => [
-                        "userId" => "1",
-                        "accountId" => "1",
+                        "user" => [
+                            "userId" => "1"
+                        ],
+                        "account" => [
+                            "accountId" => "1"
+                        ],
                     ],
                 ],
                 $payload

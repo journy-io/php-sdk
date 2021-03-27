@@ -26,7 +26,8 @@ final class Client
         RequestFactoryInterface $requestFactory,
         StreamFactoryInterface $streamFactory,
         array $config
-    ) {
+    )
+    {
         if (empty($config)) {
             throw new InvalidArgumentException("Configuration cannot be empty!");
         }
@@ -63,14 +64,14 @@ final class Client
     {
         $values = $response->getHeader("x-ratelimit-limit");
 
-        return count($values) > 0 ? (int) $values[0] : 0;
+        return count($values) > 0 ? (int)$values[0] : 0;
     }
 
     private function getRemainingRequests(ResponseInterface $response): int
     {
         $values = $response->getHeader("x-ratelimit-remaining");
 
-        return count($values) > 0 ? (int) $values[0] : 0;
+        return count($values) > 0 ? (int)$values[0] : 0;
     }
 
     private function check(ResponseInterface $response)
@@ -204,13 +205,32 @@ final class Client
     public function addEvent(Event $event): CallResult
     {
         $identification = [];
+        $userIdentification = [];
+        $accountIdentification = [];
+        $identifiedUser = false;
+        $identifiedAccount = false;
 
         if ($event->getUserId()) {
-            $identification["userId"] = $event->getUserId();
+            $userIdentification["userId"] = $event->getUserId();
+            $identifiedUser = true;
+        }
+
+        if ($event->getEmail()) {
+            $userIdentification["email"] = $event->getEmail();
+            $identifiedUser = true;
         }
 
         if ($event->getAccountId()) {
-            $identification["accountId"] = $event->getAccountId();
+            $accountIdentification["accountId"] = $event->getAccountId();
+            $identifiedAccount = true;
+        }
+
+        if ($identifiedUser) {
+            $identification["user"] = $userIdentification;
+        }
+
+        if ($identifiedAccount) {
+            $identification["account"] = $accountIdentification;
         }
 
         $payload = [
@@ -272,19 +292,29 @@ final class Client
         );
     }
 
-    public function link(string $deviceId, string $userId): CallResult
+    public function link(string $deviceId, string $userId = null, string $email = null): CallResult
     {
         if (empty($deviceId)) {
             throw new InvalidArgumentException("Device ID cannot be empty!");
         }
 
-        if (empty($userId)) {
-            throw new InvalidArgumentException("User ID cannot be empty!");
+        if (empty($userId) && empty($email)) {
+            throw new InvalidArgumentException("User ID and email cannot both be empty!");
+        }
+
+        $identification = [];
+
+        if (!empty($userId)) {
+            $identification["userId"] = $userId;
+        }
+
+        if (!empty($email)) {
+            $identification["email"] = $email;
         }
 
         $payload = [
             "deviceId" => $deviceId,
-            "userId" => $userId,
+            "identification" => $identification,
         ];
 
         $body = $this->streamFactory->createStream(json_encode($payload));
@@ -337,7 +367,7 @@ final class Client
 
         foreach ($metadata as $name => $value) {
             if (is_int($value) || is_float($value) || is_string($value)) {
-                $formatted[$name] = (string) $value;
+                $formatted[$name] = (string)$value;
             }
 
             if (is_bool($value)) {
@@ -358,7 +388,7 @@ final class Client
 
         foreach ($properties as $name => $value) {
             if (is_int($value) || is_float($value) || is_string($value)) {
-                $formatted[$name] = (string) $value;
+                $formatted[$name] = (string)$value;
             }
 
             if (is_bool($value)) {
@@ -375,17 +405,24 @@ final class Client
 
     public function upsertUser(array $user): CallResult
     {
-        if (!isset($user["userId"]) || empty($user["userId"])) {
-            throw new InvalidArgumentException("User ID cannot be empty!");
+        if ((!isset($user["userId"]) || empty($user["userId"]))
+            && (!isset($user["email"]) || empty($user["email"]))) {
+            throw new InvalidArgumentException("User ID and User email cannot both be empty!");
         }
 
-        if (!isset($user["email"]) || empty($user["email"])) {
-            throw new InvalidArgumentException("User email cannot be empty!");
+
+        $identification = [];
+
+        if (isset($user["userId"])) {
+            $identification["userId"] = (string)$user["userId"];
+        }
+
+        if (isset($user["email"])) {
+            $identification["email"] = (string)$user["email"];
         }
 
         $payload = [
-            "userId" => (string) $user["userId"],
-            "email" => (string) $user["email"],
+            "identification" => $identification
         ];
 
         if (isset($user["properties"]) && is_array($user["properties"])) {
@@ -446,9 +483,14 @@ final class Client
             throw new InvalidArgumentException("Account name cannot be empty!");
         }
 
+        $identification = [
+            "accountId" => (string)$account["accountId"]
+        ];
+
+
         $payload = [
-            "accountId" => (string) $account["accountId"],
-            "name" => (string) $account["name"],
+            "identification" => $identification,
+            "name" => (string)$account["name"],
         ];
 
         if (isset($account["properties"]) && is_array($account["properties"])) {
@@ -458,7 +500,7 @@ final class Client
         if (isset($account["members"]) && is_array($account["members"])) {
             $payload["members"] = array_map(
                 function ($value) {
-                    return (string) $value;
+                    return (string)$value;
                 },
                 $account["members"]
             );

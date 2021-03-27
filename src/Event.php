@@ -9,6 +9,7 @@ final class Event
 {
     private $name;
     private $userId;
+    private $email;
     private $accountId;
     private $recordedAt;
     private $metadata;
@@ -17,12 +18,14 @@ final class Event
         string $name,
         string $userId = null,
         string $accountId = null,
+        string $email = null,
         DateTimeInterface $recordedAt = null,
         array $metadata = []
     ) {
         $this->name = $name;
         $this->userId = $userId;
         $this->accountId = $accountId;
+        $this->email = $email;
         $this->recordedAt = $recordedAt ? clone $recordedAt : null;
         $this->metadata = $metadata;
     }
@@ -33,6 +36,7 @@ final class Event
             $this->name,
             $this->userId,
             $this->accountId,
+            $this->email,
             $time,
             $this->metadata
         );
@@ -44,6 +48,7 @@ final class Event
             $this->name,
             $this->userId,
             $this->accountId,
+            $this->email,
             $this->recordedAt,
             array_merge(
                 $this->metadata,
@@ -59,6 +64,15 @@ final class Event
         }
 
         return new Event($name, $userId);
+    }
+
+    public static function forEmail(string $name, string $email): Event
+    {
+        if (empty($email)) {
+            throw new InvalidArgumentException("User ID cannot be empty!");
+        }
+
+        return new Event($name, null, null, $email);
     }
 
     public static function forAccount(string $name, string $accountId): Event
@@ -96,6 +110,11 @@ final class Event
     public function getAccountId()
     {
         return $this->accountId;
+    }
+
+    public function getEmail()
+    {
+        return $this->email;
     }
 
     public function getRecordedAt()
