@@ -182,14 +182,17 @@ class ClientTest extends TestCase
             $client->upsertAccount(
                 [
                     "accountId" => "1",
-                    "name" => "journy.io",
+                    "domain" => "journy.io",
                     "properties" => [
                         "string" => "string",
                         "boolean" => true,
                         "number" => 22,
                         "date" => $now,
                     ],
-                    "members" => ["1", "2"],
+                    "members" => [
+                        ["userId" => "1"],
+                        ["userId" => "2"],
+                    ],
                 ]
             )
         );
@@ -203,16 +206,23 @@ class ClientTest extends TestCase
             $this->assertEquals(
                 [
                     "identification" => [
-                        "accountId" => "1"
+                        "accountId" => "1",
+                        "domain" => "journy.io",
                     ],
-                    "name" => "journy.io",
                     "properties" => [
                         "string" => "string",
                         "boolean" => "true",
                         "number" => "22",
                         "date" => $now->format(DATE_ATOM),
                     ],
-                    "members" => ["1", "2"],
+                    "members" => [
+                        [
+                            "identification" => ["userId" => "1"],
+                        ],
+                        [
+                            "identification" => ["userId" => "2"],
+                        ],
+                    ],
                 ],
                 $payload
             );
@@ -228,7 +238,7 @@ class ClientTest extends TestCase
 
         $this->assertEquals(
             new CallResult(true, false, 0, 0, [], null),
-            $client->addEvent(Event::forUser("login", "1"))
+            $client->addEvent(Event::forUser("login", UserIdentified::byUserId("1")))
         );
 
         $request = $http->getLastRequest();
@@ -257,11 +267,10 @@ class ClientTest extends TestCase
         $json = '{"message":"The data is correctly stored.","meta":{"status":201,"requestId":"01ETG3HQ4JY4HNNZ84FBJM3CSC"}}';
         $http = new HttpClientFixed(new Response(201, [], $json));
         $client = new Client($http, $factory, $factory, ["apiKey" => "key"]);
-        $now = new DateTimeImmutable("now");
 
         $this->assertEquals(
             new CallResult(true, false, 0, 0, [], null),
-            $client->link("deviceId", "userId")
+            $client->link(["deviceId" => "deviceId", "userId" => "userId", "email" => "email"])
         );
 
         $request = $http->getLastRequest();
@@ -274,7 +283,8 @@ class ClientTest extends TestCase
                 [
                     "deviceId" => "deviceId",
                     "identification" => [
-                        "userId" => "userId"
+                        "userId" => "userId",
+                        "email" => "email",
                     ],
                 ],
                 $payload
@@ -292,7 +302,7 @@ class ClientTest extends TestCase
 
         $this->assertEquals(
             new CallResult(true, false, 0, 0, [], null),
-            $client->addEvent(Event::forUser("login", "1")->happenedAt($now))
+            $client->addEvent(Event::forUser("login", UserIdentified::byUserId("1"))->happenedAt($now))
         );
 
         $request = $http->getLastRequest();
@@ -327,7 +337,7 @@ class ClientTest extends TestCase
         $this->assertEquals(
             new CallResult(true, false, 0, 0, [], null),
             $client->addEvent(
-                Event::forUser("login", "1")->withMetadata([
+                Event::forUser("login", UserIdentified::byUserId("1"))->withMetadata([
                     "number" => 1,
                     "string" => "string",
                     "boolean" => false,
@@ -369,7 +379,7 @@ class ClientTest extends TestCase
 
         $this->assertEquals(
             new CallResult(true, false, 0, 0, [], null),
-            $client->addEvent(Event::forAccount("login", "1"))
+            $client->addEvent(Event::forAccount("login", AccountIdentified::byAccountId("1")))
         );
 
         $request = $http->getLastRequest();
@@ -401,7 +411,7 @@ class ClientTest extends TestCase
 
         $this->assertEquals(
             new CallResult(true, false, 0, 0, [], null),
-            $client->addEvent(Event::forUserInAccount("login", "1", "1"))
+            $client->addEvent(Event::forUserInAccount("login", UserIdentified::byUserId("1"), AccountIdentified::byAccountId("1")))
         );
 
         $request = $http->getLastRequest();
@@ -435,7 +445,7 @@ class ClientTest extends TestCase
 
         $this->assertEquals(
             new CallResult(false, false, 0, 0, ["something unexpected happened"], null),
-            $client->addEvent(Event::forUser("login", "1"))
+            $client->addEvent(Event::forUser("login", UserIdentified::byUserId("1")))
         );
     }
 
@@ -450,7 +460,7 @@ class ClientTest extends TestCase
             new CallResult(false, false, 0, 0,
                 ['You are not authorized to \'GET\' the path \'/tracking/snippet\' with this API Key. You need the permission: GetTrackingSnippet.'],
                 null),
-            $client->addEvent(Event::forUser("login", "1"))
+            $client->addEvent(Event::forUser("login", UserIdentified::byUserId("1")))
         );
     }
 
@@ -464,7 +474,7 @@ class ClientTest extends TestCase
 
         $this->assertEquals(
             new CallResult(true, false, 1999, 2000, [], null),
-            $client->addEvent(Event::forUser("login", "1"))
+            $client->addEvent(Event::forUser("login", UserIdentified::byUserId("1")))
         );
     }
 
@@ -477,7 +487,7 @@ class ClientTest extends TestCase
 
         $this->assertEquals(
             new CallResult(false, true, 0, 0, ["rate limited"], null),
-            $client->addEvent(Event::forUser("login", "1"))
+            $client->addEvent(Event::forUser("login", UserIdentified::byUserId("1")))
         );
     }
 }

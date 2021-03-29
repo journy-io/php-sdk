@@ -3,29 +3,25 @@
 namespace JournyIO\SDK;
 
 use DateTimeInterface;
-use InvalidArgumentException;
 
 final class Event
 {
     private $name;
-    private $userId;
-    private $email;
-    private $accountId;
+    private $user;
+    private $account;
     private $recordedAt;
     private $metadata;
 
     private function __construct(
         string $name,
-        string $userId = null,
-        string $accountId = null,
-        string $email = null,
+        UserIdentified $user = null,
+        AccountIdentified $account = null,
         DateTimeInterface $recordedAt = null,
         array $metadata = []
     ) {
         $this->name = $name;
-        $this->userId = $userId;
-        $this->accountId = $accountId;
-        $this->email = $email;
+        $this->user = $user;
+        $this->account = $account;
         $this->recordedAt = $recordedAt ? clone $recordedAt : null;
         $this->metadata = $metadata;
     }
@@ -34,9 +30,8 @@ final class Event
     {
         return new Event(
             $this->name,
-            $this->userId,
-            $this->accountId,
-            $this->email,
+            $this->user,
+            $this->account,
             $time,
             $this->metadata
         );
@@ -46,9 +41,8 @@ final class Event
     {
         return new Event(
             $this->name,
-            $this->userId,
-            $this->accountId,
-            $this->email,
+            $this->user,
+            $this->account,
             $this->recordedAt,
             array_merge(
                 $this->metadata,
@@ -57,44 +51,19 @@ final class Event
         );
     }
 
-    public static function forUser(string $name, string $userId): Event
+    public static function forUser(string $name, UserIdentified $identifiers): Event
     {
-        if (empty($userId)) {
-            throw new InvalidArgumentException("User ID cannot be empty!");
-        }
-
-        return new Event($name, $userId);
+        return new Event($name, $identifiers);
     }
 
-    public static function forEmail(string $name, string $email): Event
+    public static function forAccount(string $name, AccountIdentified $identifiers): Event
     {
-        if (empty($email)) {
-            throw new InvalidArgumentException("User ID cannot be empty!");
-        }
-
-        return new Event($name, null, null, $email);
+        return new Event($name, null, $identifiers);
     }
 
-    public static function forAccount(string $name, string $accountId): Event
+    public static function forUserInAccount(string $name, UserIdentified $user, AccountIdentified $account): Event
     {
-        if (empty($accountId)) {
-            throw new InvalidArgumentException("Account ID cannot be empty!");
-        }
-
-        return new Event($name, null, $accountId);
-    }
-
-    public static function forUserInAccount(string $name, string $userId, string $accountId): Event
-    {
-        if (empty($userId)) {
-            throw new InvalidArgumentException("User ID cannot be empty!");
-        }
-
-        if (empty($accountId)) {
-            throw new InvalidArgumentException("Account ID cannot be empty!");
-        }
-
-        return new Event($name, $userId, $accountId);
+        return new Event($name, $user, $account);
     }
 
     public function getName()
@@ -102,19 +71,14 @@ final class Event
         return $this->name;
     }
 
-    public function getUserId()
+    public function getUser()
     {
-        return $this->userId;
+        return $this->user;
     }
 
-    public function getAccountId()
+    public function getAccount()
     {
-        return $this->accountId;
-    }
-
-    public function getEmail()
-    {
-        return $this->email;
+        return $this->account;
     }
 
     public function getRecordedAt()

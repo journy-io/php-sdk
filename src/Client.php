@@ -201,35 +201,50 @@ final class Client
         );
     }
 
+    private function userIdentifiersToArray(UserIdentified $user): array
+    {
+        $result = [];
+
+        $userId = $user->getUserId();
+        if ($userId) {
+            $result["userId"] = $userId;
+        }
+
+        $email = $user->getEmail();
+        if ($email) {
+            $result["email"] = $email;
+        }
+
+        return $result;
+    }
+
+    private function accountIdentifiersToArray(AccountIdentified $account): array
+    {
+        $result = [];
+
+        $accountId = $account->getAccountId();
+        if ($accountId) {
+            $result["accountId"] = $accountId;
+        }
+
+        $domain = $account->getDomain();
+        if ($domain) {
+            $result["domain"] = $domain;
+        }
+
+        return $result;
+    }
+
     public function addEvent(Event $event): CallResult
     {
         $identification = [];
-        $userIdentification = [];
-        $accountIdentification = [];
-        $identifiedUser = false;
-        $identifiedAccount = false;
 
-        if ($event->getUserId()) {
-            $userIdentification["userId"] = $event->getUserId();
-            $identifiedUser = true;
+        if ($event->getUser() instanceof UserIdentified) {
+            $identification["user"] = $this->userIdentifiersToArray($event->getUser());
         }
 
-        if ($event->getEmail()) {
-            $userIdentification["email"] = $event->getEmail();
-            $identifiedUser = true;
-        }
-
-        if ($event->getAccountId()) {
-            $accountIdentification["accountId"] = $event->getAccountId();
-            $identifiedAccount = true;
-        }
-
-        if ($identifiedUser) {
-            $identification["user"] = $userIdentification;
-        }
-
-        if ($identifiedAccount) {
-            $identification["account"] = $accountIdentification;
+        if ($event->getAccount() instanceof AccountIdentified) {
+            $identification["account"] = $this->accountIdentifiersToArray($event->getAccount());
         }
 
         $payload = [
@@ -291,29 +306,20 @@ final class Client
         );
     }
 
-    public function link(string $deviceId, string $userId = null, string $email = null): CallResult
+    public function link(array $arguments): CallResult
     {
-        if (empty($deviceId)) {
+        if (isset($arguments["deviceId"]) === false || empty($arguments["deviceId"])) {
             throw new InvalidArgumentException("Device ID cannot be empty!");
         }
 
-        if (empty($userId) && empty($email)) {
-            throw new InvalidArgumentException("User ID and email cannot both be empty!");
-        }
-
-        $identification = [];
-
-        if (!empty($userId)) {
-            $identification["userId"] = $userId;
-        }
-
-        if (!empty($email)) {
-            $identification["email"] = $email;
-        }
-
         $payload = [
-            "deviceId" => $deviceId,
-            "identification" => $identification,
+            "deviceId" => $arguments["deviceId"],
+            "identification" => $this->userIdentifiersToArray(
+                new UserIdentified(
+                    $arguments["userId"] ?? null,
+                    $arguments["email"] ?? null
+                )
+            ),
         ];
 
         $body = $this->streamFactory->createStream(json_encode($payload));
@@ -360,7 +366,7 @@ final class Client
         );
     }
 
-    private function formatMetadata(array $metadata)
+    private function formatMetadata(array $metadata): array
     {
         $formatted = array();
 
@@ -381,7 +387,7 @@ final class Client
         return $formatted;
     }
 
-    private function formatProperties(array $properties)
+    private function formatProperties(array $properties): array
     {
         $formatted = array();
 
@@ -404,24 +410,13 @@ final class Client
 
     public function upsertUser(array $user): CallResult
     {
-        if ((!isset($user["userId"]) || empty($user["userId"]))
-            && (!isset($user["email"]) || empty($user["email"]))) {
-            throw new InvalidArgumentException("User ID and User email cannot both be empty!");
-        }
-
-
-        $identification = [];
-
-        if (isset($user["userId"])) {
-            $identification["userId"] = (string)$user["userId"];
-        }
-
-        if (isset($user["email"])) {
-            $identification["email"] = (string)$user["email"];
-        }
-
         $payload = [
-            "identification" => $identification
+            "identification" => $this->userIdentifiersToArray(
+                new UserIdentified(
+                    $user["userId"] ?? null,
+                    $user["email"] ?? null
+                )
+            ),
         ];
 
         if (isset($user["properties"]) && is_array($user["properties"])) {
@@ -474,22 +469,13 @@ final class Client
 
     public function upsertAccount(array $account): CallResult
     {
-        if (!isset($account["accountId"]) || empty($account["accountId"])) {
-            throw new InvalidArgumentException("Account ID cannot be empty!");
-        }
-
-        if (!isset($account["name"]) || empty($account["name"])) {
-            throw new InvalidArgumentException("Account name cannot be empty!");
-        }
-
-        $identification = [
-            "accountId" => (string)$account["accountId"]
-        ];
-
-
         $payload = [
-            "identification" => $identification,
-            "name" => (string)$account["name"],
+            "identification" => $this->accountIdentifiersToArray(
+                new AccountIdentified(
+                    $account["accountId"] ?? null,
+                    $account["domain"] ?? null
+                )
+            ),
         ];
 
         if (isset($account["properties"]) && is_array($account["properties"])) {
@@ -498,8 +484,15 @@ final class Client
 
         if (isset($account["members"]) && is_array($account["members"])) {
             $payload["members"] = array_map(
-                function ($value) {
-                    return (string)$value;
+                function (array $user) {
+                    return [
+                        "identification" => $this->userIdentifiersToArray(
+                            new UserIdentified(
+                                $user["userId"] ?? null,
+                                $user["email"] ?? null
+                            )
+                        ),
+                    ];
                 },
                 $account["members"]
             );
