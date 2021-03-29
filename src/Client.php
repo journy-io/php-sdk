@@ -191,6 +191,17 @@ final class Client
             );
         }
 
+        if ($response->getStatusCode() === 404) {
+            return new CallResult(
+                false,
+                false,
+                $this->getRemainingRequests($response),
+                $this->getMaxRequests($response),
+                $json['message'] ? [$json['message']] : [],
+                null
+            );
+        }
+
         return new CallResult(
             false,
             false,
