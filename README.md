@@ -110,6 +110,8 @@ $call = $client->upsertUser([
 
     // optional
     "properties" => [
+        "first_name" => "John",
+        "last_name" => "Doe",
         "plan" => "Pro",
         "age" => 26,
         "is_developer" => true,
@@ -125,21 +127,24 @@ _Note: when sending an empty value (`""`) as value for a property, the property 
 
 ```php
 $call = $client->upsertAccount([
-    // required
     "accountId" => "accountId", // Unique identifier for the account in your database
-    "name" => "Name",
+    "domain" => "acme-inc.com",
 
     // optional
     "properties" => [
+        "name" => "Acme, Inc",
         "plan" => "Pro",
-        "age" => 26,
-        "is_developer" => true,
+        "is_paying_account" => true,
+        "amount_of_users" => 3,
         "registered_at" => new \DateTimeImmutable("..."),
         "this_property_will_be_deleted" => "",
     ],
 
     // optional
-    "members" => ["userId", "userId"], // Unique identifier for the user in your database
+    "members" => [
+        ["userId" => "1"], // Unique identifier for the user in your database
+        ["userId" => "2"]
+    ],
 ]);
 ```
 
@@ -159,7 +164,11 @@ $deviceId = $request->cookie("__journey");
 $deviceId = $request->cookies->get("__journey");
 
 if ($deviceId) {
-  $call = $client->link($deviceId, "userId");
+    $call = $client->link([
+        "deviceId" => "deviceId",
+        "userId" => "userId",
+        "email" => "email",
+    ]);
 }
 ```
 
@@ -167,15 +176,28 @@ if ($deviceId) {
 
 ```php
 use JournyIO\SDK\Event;
+use JournyIO\SDK\UserIdentified;
+use JournyIO\SDK\AccountIdentified;
 
-$event = Event::forUser("login", "userId");
-$event = Event::forUser("some_historic_event", "userId")->happenedAt(new \DateTimeImmutable("now"));
-$event = Event::forAccount("reached_monthly_volume", "accountId")->withMetadata([
-    "number" => 13313,
-    "string" => "string",
-    "boolean" => true,
-]);
-$event = Event::forUserInAccount("updated_settings", "userId", "accountId");
+$event = Event::forUser("login", UserIdentified::byUserId("userId"));
+
+$event = Event::forUser("some_historic_event", UserIdentified::byUserId("userId"))
+    ->happenedAt(new \DateTimeImmutable("now"))
+;
+
+$event = Event::forAccount("reached_monthly_volume", AccountIdentified::byAccountId("accountId"))
+    ->withMetadata([
+        "number" => 13313,
+        "string" => "string",
+        "boolean" => true,
+    ])
+;
+
+$event = Event::forUserInAccount(
+    "updated_settings",
+    UserIdentified::byUserId("userId"),
+    AccountIdentified::byAccountId("accountId")
+);
 
 $call = $client->addEvent($event);
 ```
