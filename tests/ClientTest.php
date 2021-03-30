@@ -169,6 +169,53 @@ class ClientTest extends TestCase
         }
     }
 
+    public function test_it_upserts_user_without_user_id()
+    {
+        $factory = new Psr17Factory();
+        $json = '{"message":"The data is correctly stored.","meta":{"status":201,"requestId":"01ETG3HQ4JY4HNNZ84FBJM3CSC"}}';
+        $http = new HttpClientFixed(new Response(201, [], $json));
+        $client = new Client($http, $factory, $factory, ["apiKey" => "key"]);
+        $now = new DateTimeImmutable("now");
+
+        $this->assertEquals(
+            new CallResult(true, false, 0, 0, [], null),
+            $client->upsertUser(
+                [
+                    "email" => "hans@journy.io",
+                    "properties" => [
+                        "string" => "string",
+                        "boolean" => true,
+                        "number" => 22,
+                        "date" => $now,
+                    ],
+                ]
+            )
+        );
+
+        $request = $http->getLastRequest();
+        $this->assertInstanceOf(RequestInterface::class, $request);
+
+        if ($request instanceof RequestInterface) {
+            $request->getBody()->rewind();
+            $body = $request->getBody()->getContents();
+            $payload = json_decode($body, true);
+            $this->assertEquals(
+                [
+                    "identification" => [
+                        "email" => "hans@journy.io",
+                    ],
+                    "properties" => [
+                        "string" => "string",
+                        "boolean" => "true",
+                        "number" => "22",
+                        "date" => $now->format(DATE_ATOM),
+                    ],
+                ],
+                $payload
+            );
+        }
+    }
+
     public function test_it_upserts_account()
     {
         $factory = new Psr17Factory();
@@ -229,6 +276,65 @@ class ClientTest extends TestCase
         }
     }
 
+    public function test_it_upserts_account_without_account_id()
+    {
+        $factory = new Psr17Factory();
+        $json = '{"message":"The data is correctly stored.","meta":{"status":201,"requestId":"01ETG3HQ4JY4HNNZ84FBJM3CSC"}}';
+        $http = new HttpClientFixed(new Response(201, [], $json));
+        $client = new Client($http, $factory, $factory, ["apiKey" => "key"]);
+        $now = new DateTimeImmutable("now");
+
+        $this->assertEquals(
+            new CallResult(true, false, 0, 0, [], null),
+            $client->upsertAccount(
+                [
+                    "domain" => "journy.io",
+                    "properties" => [
+                        "string" => "string",
+                        "boolean" => true,
+                        "number" => 22,
+                        "date" => $now,
+                    ],
+                    "members" => [
+                        ["userId" => "1"],
+                        ["userId" => "2"],
+                    ],
+                ]
+            )
+        );
+
+        $request = $http->getLastRequest();
+        $this->assertInstanceOf(RequestInterface::class, $request);
+        if ($request instanceof RequestInterface) {
+            $request->getBody()->rewind();
+            $body = $request->getBody()->getContents();
+            $payload = json_decode($body, true);
+            $this->assertEquals(
+                [
+                    "identification" => [
+                        "domain" => "journy.io",
+                    ],
+                    "properties" => [
+                        "string" => "string",
+                        "boolean" => "true",
+                        "number" => "22",
+                        "date" => $now->format(DATE_ATOM),
+                    ],
+                    "members" => [
+                        [
+                            "identification" => ["userId" => "1"],
+                        ],
+                        [
+                            "identification" => ["userId" => "2"],
+                        ],
+                    ],
+                ],
+                $payload
+            );
+        }
+    }
+
+
     public function test_it_triggers_event_for_user()
     {
         $factory = new Psr17Factory();
@@ -261,6 +367,38 @@ class ClientTest extends TestCase
         }
     }
 
+    public function test_it_triggers_event_for_user_with_email()
+    {
+        $factory = new Psr17Factory();
+        $json = '{"message":"The data is correctly stored.","meta":{"status":201,"requestId":"01ETG3HQ4JY4HNNZ84FBJM3CSC"}}';
+        $http = new HttpClientFixed(new Response(201, [], $json));
+        $client = new Client($http, $factory, $factory, ["apiKey" => "key"]);
+
+        $this->assertEquals(
+            new CallResult(true, false, 0, 0, [], null),
+            $client->addEvent(Event::forUser("login", UserIdentified::byEmail("hi@journy.io")))
+        );
+
+        $request = $http->getLastRequest();
+        $this->assertInstanceOf(RequestInterface::class, $request);
+        if ($request instanceof RequestInterface) {
+            $request->getBody()->rewind();
+            $body = $request->getBody()->getContents();
+            $payload = json_decode($body, true);
+            $this->assertEquals(
+                [
+                    "name" => "login",
+                    "identification" => [
+                        "user" => [
+                            "email" => "hi@journy.io"
+                        ],
+                    ],
+                ],
+                $payload
+            );
+        }
+    }
+
     public function test_it_links_web_visitor_with_user()
     {
         $factory = new Psr17Factory();
@@ -284,6 +422,36 @@ class ClientTest extends TestCase
                     "deviceId" => "deviceId",
                     "identification" => [
                         "userId" => "userId",
+                        "email" => "email",
+                    ],
+                ],
+                $payload
+            );
+        }
+    }
+
+    public function test_it_links_web_visitor_with_user_without_user_id()
+    {
+        $factory = new Psr17Factory();
+        $json = '{"message":"The data is correctly stored.","meta":{"status":201,"requestId":"01ETG3HQ4JY4HNNZ84FBJM3CSC"}}';
+        $http = new HttpClientFixed(new Response(201, [], $json));
+        $client = new Client($http, $factory, $factory, ["apiKey" => "key"]);
+
+        $this->assertEquals(
+            new CallResult(true, false, 0, 0, [], null),
+            $client->link(["deviceId" => "deviceId", "email" => "email"])
+        );
+
+        $request = $http->getLastRequest();
+        $this->assertInstanceOf(RequestInterface::class, $request);
+        if ($request instanceof RequestInterface) {
+            $request->getBody()->rewind();
+            $body = $request->getBody()->getContents();
+            $payload = json_decode($body, true);
+            $this->assertEquals(
+                [
+                    "deviceId" => "deviceId",
+                    "identification" => [
                         "email" => "email",
                     ],
                 ],
