@@ -334,6 +334,51 @@ class ClientTest extends TestCase
         }
     }
 
+    public function test_it_deals_with_sparse_arrays()
+    {
+        $factory = new Psr17Factory();
+        $json = '{"message":"The data is correctly stored.","meta":{"status":201,"requestId":"01ETG3HQ4JY4HNNZ84FBJM3CSC"}}';
+        $http = new HttpClientFixed(new Response(201, [], $json));
+        $client = new Client($http, $factory, $factory, ["apiKey" => "key"]);
+        $now = new DateTimeImmutable("now");
+
+        $this->assertEquals(
+            new CallResult(true, false, 0, 0, [], null),
+            $client->upsertAccount(
+                [
+                    "accountId" => "1",
+                    "members" => [
+                        1 => ["userId" => "1"],
+                        2 => ["userId" => "2"],
+                    ],
+                ]
+            )
+        );
+
+        $request = $http->getLastRequest();
+        $this->assertInstanceOf(RequestInterface::class, $request);
+        if ($request instanceof RequestInterface) {
+            $request->getBody()->rewind();
+            $body = $request->getBody()->getContents();
+            $payload = json_decode($body, true);
+            $this->assertEquals(
+                [
+                    "identification" => [
+                        "accountId" => "1",
+                    ],
+                    "members" => [
+                        [
+                            "identification" => ["userId" => "1"],
+                        ],
+                        [
+                            "identification" => ["userId" => "2"],
+                        ],
+                    ],
+                ],
+                $payload
+            );
+        }
+    }
 
     public function test_it_triggers_event_for_user()
     {

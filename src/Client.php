@@ -505,7 +505,7 @@ final class Client
                         ),
                     ];
                 },
-                $account["members"]
+                array_values($account["members"])
             );
         }
 
