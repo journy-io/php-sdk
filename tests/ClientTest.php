@@ -672,9 +672,14 @@ class ClientTest extends TestCase
         $client = new Client($http, $factory, $factory, ["apiKey" => "key"]);
 
         $this->assertEquals(
-            new CallResult(false, false, 0, 0,
+            new CallResult(
+                false,
+                false,
+                0,
+                0,
                 ['You are not authorized to \'GET\' the path \'/tracking/snippet\' with this API Key. You need the permission: GetTrackingSnippet.'],
-                null),
+                null
+            ),
             $client->addEvent(Event::forUser("login", UserIdentified::byUserId("1")))
         );
     }
@@ -683,8 +688,11 @@ class ClientTest extends TestCase
     {
         $factory = new Psr17Factory();
         $json = '{"message":"The data is correctly stored.","meta":{"status":201,"requestId":"01ETG3HQ4JY4HNNZ84FBJM3CSC"}}';
-        $http = new HttpClientFixed(new Response(201,
-            ["x-ratelimit-remaining" => "1999", "x-ratelimit-limit" => "2000"], $json));
+        $http = new HttpClientFixed(new Response(
+            201,
+            ["x-ratelimit-remaining" => "1999", "x-ratelimit-limit" => "2000"],
+            $json
+        ));
         $client = new Client($http, $factory, $factory, ["apiKey" => "key"]);
 
         $this->assertEquals(

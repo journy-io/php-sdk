@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace JournyIO\SDK;
 
@@ -63,14 +65,14 @@ final class Client
     {
         $values = $response->getHeader("x-ratelimit-limit");
 
-        return count($values) > 0 ? (int)$values[0] : 0;
+        return count($values) > 0 ? (int) $values[0] : 0;
     }
 
     private function getRemainingRequests(ResponseInterface $response): int
     {
         $values = $response->getHeader("x-ratelimit-remaining");
 
-        return count($values) > 0 ? (int)$values[0] : 0;
+        return count($values) > 0 ? (int) $values[0] : 0;
     }
 
     private function check(ResponseInterface $response)
