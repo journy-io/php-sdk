@@ -327,8 +327,8 @@ final class Client
             "deviceId" => $arguments["deviceId"],
             "identification" => $this->userIdentifiersToArray(
                 new UserIdentified(
-                    $arguments["userId"] ?? null,
-                    $arguments["email"] ?? null
+                    isset($arguments["userId"]) ? (string) $arguments["userId"] :  null,
+                    isset($arguments["email"]) ? (string) $arguments["email"] : null
                 )
             ),
         ];
@@ -382,17 +382,17 @@ final class Client
         $formatted = array();
 
         foreach ($metadata as $name => $value) {
-            if (is_int($value) || is_float($value) || is_string($value)) {
-                $formatted[$name] = (string)$value;
-            }
-
-            if (is_bool($value)) {
-                $formatted[$name] = $value ? "true" : "false";
+            if (is_int($value) || is_float($value) || is_string($value) || is_bool($value)) {
+                $formatted[$name] = $value;
+                continue;
             }
 
             if ($value instanceof DateTimeInterface) {
                 $formatted[$name] = $value->format(DATE_ATOM);
+                continue;
             }
+
+            $formatted[$name] = (string) $value;
         }
 
         return $formatted;
@@ -403,17 +403,17 @@ final class Client
         $formatted = array();
 
         foreach ($properties as $name => $value) {
-            if (is_int($value) || is_float($value) || is_string($value)) {
-                $formatted[$name] = (string)$value;
-            }
-
-            if (is_bool($value)) {
-                $formatted[$name] = $value ? "true" : "false";
+            if (is_int($value) || is_float($value) || is_string($value) || is_bool($value)) {
+                $formatted[$name] = $value;
+                continue;
             }
 
             if ($value instanceof DateTimeInterface) {
                 $formatted[$name] = $value->format(DATE_ATOM);
+                continue;
             }
+
+            $formatted[$name] = (string) $value;
         }
 
         return $formatted;
@@ -424,8 +424,8 @@ final class Client
         $payload = [
             "identification" => $this->userIdentifiersToArray(
                 new UserIdentified(
-                    $user["userId"] ?? null,
-                    $user["email"] ?? null
+                    isset($user["userId"]) ? (string) $user["userId"] :  null,
+                    isset($user["email"]) ? (string) $user["email"] : null
                 )
             ),
         ];
@@ -483,8 +483,8 @@ final class Client
         $payload = [
             "identification" => $this->accountIdentifiersToArray(
                 new AccountIdentified(
-                    $account["accountId"] ?? null,
-                    $account["domain"] ?? null
+                    isset($account["accountId"]) ? (string) $account["accountId"] :  null,
+                    isset($account["domain"]) ? (string) $account["domain"] : null
                 )
             ),
         ];
@@ -499,8 +499,8 @@ final class Client
                     return [
                         "identification" => $this->userIdentifiersToArray(
                             new UserIdentified(
-                                $user["userId"] ?? null,
-                                $user["email"] ?? null
+                                isset($user["userId"]) ? (string) $user["userId"] :  null,
+                                isset($user["email"]) ? (string) $user["email"] : null
                             )
                         ),
                     ];

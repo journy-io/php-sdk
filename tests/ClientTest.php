@@ -133,12 +133,13 @@ class ClientTest extends TestCase
             $client->upsertUser(
                 [
                     "userId" => "1",
-                    "email" => "hans@journy.io",
+                    "email" => new Email("hans@journy.io"),
                     "properties" => [
                         "string" => "string",
                         "boolean" => true,
                         "number" => 22,
                         "date" => $now,
+                        "phone" => new PhoneNumber("number"),
                     ],
                 ]
             )
@@ -159,9 +160,10 @@ class ClientTest extends TestCase
                     ],
                     "properties" => [
                         "string" => "string",
-                        "boolean" => "true",
-                        "number" => "22",
+                        "boolean" => true,
+                        "number" => 22,
                         "date" => $now->format(DATE_ATOM),
+                        "phone" => "number",
                     ],
                 ],
                 $payload
@@ -206,8 +208,8 @@ class ClientTest extends TestCase
                     ],
                     "properties" => [
                         "string" => "string",
-                        "boolean" => "true",
-                        "number" => "22",
+                        "boolean" => true,
+                        "number" => 22,
                         "date" => $now->format(DATE_ATOM),
                     ],
                 ],
@@ -253,13 +255,13 @@ class ClientTest extends TestCase
             $this->assertEquals(
                 [
                     "identification" => [
-                        "accountId" => "1",
+                        "accountId" => 1,
                         "domain" => "journy.io",
                     ],
                     "properties" => [
                         "string" => "string",
-                        "boolean" => "true",
-                        "number" => "22",
+                        "boolean" => true,
+                        "number" => 22,
                         "date" => $now->format(DATE_ATOM),
                     ],
                     "members" => [
@@ -316,8 +318,8 @@ class ClientTest extends TestCase
                     ],
                     "properties" => [
                         "string" => "string",
-                        "boolean" => "true",
-                        "number" => "22",
+                        "boolean" => true,
+                        "number" => 22,
                         "date" => $now->format(DATE_ATOM),
                     ],
                     "members" => [
@@ -573,9 +575,9 @@ class ClientTest extends TestCase
                         ],
                     ],
                     "metadata" => [
-                        "number" => "1",
+                        "number" => 1,
                         "string" => "string",
-                        "boolean" => "false",
+                        "boolean" => false,
                     ],
                 ],
                 $payload
