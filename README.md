@@ -102,7 +102,7 @@ if ($call->succeeded()) {
 
 #### Create or update user
 
-_Note: when sending an empty value (`""`) as value for a property, the property will be deleted._
+Note: `full_name`, `first_name`, `last_name`, `phone` and `registered_at` are default properties
 
 ```php
 $call = $client->upsertUser([
@@ -112,20 +112,19 @@ $call = $client->upsertUser([
 
     // optional
     "properties" => [
+        "full_name" => "John Doe",
         "first_name" => "John",
         "last_name" => "Doe",
-        "plan" => "Pro",
-        "age" => 26,
-        "is_developer" => true,
-        "registered_at" => new DateTimeImmutable("..."),
-        "this_property_will_be_deleted" => "",
+        "phone" => "123",
+        "registered_at" => new \DateTimeImmutable("..."),
+        "is_admin" => true,
     ],
 ]);
 ```
 
 #### Create or update account
 
-_Note: when sending an empty value (`""`) as value for a property, the property will be deleted._
+Note: `name`, `mrr`, `plan` and `registered_at` are default properties
 
 ```php
 $call = $client->upsertAccount([
@@ -135,11 +134,10 @@ $call = $client->upsertAccount([
     // optional
     "properties" => [
         "name" => "Acme, Inc",
+        "mrr" => 399,
         "plan" => "Pro",
-        "is_paying_account" => true,
-        "amount_of_users" => 3,
         "registered_at" => new \DateTimeImmutable("..."),
-        "this_property_will_be_deleted" => "",
+        "is_paying" => true,
     ],
 
     // optional
