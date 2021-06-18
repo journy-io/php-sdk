@@ -140,6 +140,8 @@ class ClientTest extends TestCase
                         "number" => 22,
                         "date" => $now,
                         "phone" => new PhoneNumber("number"),
+                        "will_be_deleted" => null,
+                        "array_of_values" => ["a", "b"]
                     ],
                 ]
             )
@@ -164,6 +166,8 @@ class ClientTest extends TestCase
                         "number" => 22,
                         "date" => $now->format(DATE_ATOM),
                         "phone" => "number",
+                        "will_be_deleted" => null,
+                        "array_of_values" => ["a", "b"]
                     ],
                 ],
                 $payload
