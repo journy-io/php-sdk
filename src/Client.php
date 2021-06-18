@@ -405,8 +405,7 @@ final class Client
         $formatted = array();
 
         foreach ($properties as $name => $value) {
-            if (
-                is_int($value) || is_float($value) || is_string($value) || is_bool($value) || is_array($value)
+            if (is_int($value) || is_float($value) || is_string($value) || is_bool($value) || is_array($value)
                 || is_null($value)
             ) {
                 $formatted[$name] = $value;
