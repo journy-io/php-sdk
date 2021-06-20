@@ -86,8 +86,17 @@ final class Client
                 false,
                 $this->getRemainingRequests($response),
                 $this->getMaxRequests($response),
-                [$json["message"]],
-                null
+                [$json["message"]]
+            );
+        }
+
+        if ($response->getStatusCode() === 403) {
+            return new CallResult(
+                false,
+                false,
+                $this->getRemainingRequests($response),
+                $this->getMaxRequests($response),
+                ["the api key is disabled"]
             );
         }
 
@@ -107,8 +116,7 @@ final class Client
                 true,
                 $this->getRemainingRequests($response),
                 $this->getMaxRequests($response),
-                ["rate limited"],
-                null
+                ["rate limited"]
             );
         }
     }

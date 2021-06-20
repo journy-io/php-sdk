@@ -668,6 +668,18 @@ class ClientTest extends TestCase
         );
     }
 
+    public function test_it_deals_with_forbidden_error()
+    {
+        $factory = new Psr17Factory();
+        $http = new HttpClientFixed(new Response(403, [], null));
+        $client = new Client($http, $factory, $factory, ["apiKey" => "key"]);
+
+        $this->assertEquals(
+            new CallResult(false, false, 0, 0, ["the api key is disabled"], null),
+            $client->addEvent(Event::forUser("login", UserIdentified::byUserId("1")))
+        );
+    }
+
     public function test_it_deals_with_unauthorized_error()
     {
         $factory = new Psr17Factory();
