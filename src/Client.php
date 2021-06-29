@@ -77,17 +77,26 @@ final class Client
 
     private function check(ResponseInterface $response)
     {
-        if ($response->getStatusCode() === 401) {
-            $response->getBody()->rewind();
-            $json = json_decode($response->getBody()->getContents(), true);
+        $response->getBody()->rewind();
+        $json = json_decode($response->getBody()->getContents(), true);
 
+        if ($response->getStatusCode() === 401) {
             return new CallResult(
                 false,
                 false,
                 $this->getRemainingRequests($response),
                 $this->getMaxRequests($response),
-                [$json["message"]],
-                null
+                [$json["message"]]
+            );
+        }
+
+        if ($response->getStatusCode() === 403) {
+            return new CallResult(
+                false,
+                false,
+                $this->getRemainingRequests($response),
+                $this->getMaxRequests($response),
+                [$json["message"]]
             );
         }
 
@@ -107,8 +116,7 @@ final class Client
                 true,
                 $this->getRemainingRequests($response),
                 $this->getMaxRequests($response),
-                ["rate limited"],
-                null
+                [$json["message"]]
             );
         }
     }
@@ -329,7 +337,7 @@ final class Client
             "deviceId" => $arguments["deviceId"],
             "identification" => $this->userIdentifiersToArray(
                 new UserIdentified(
-                    isset($arguments["userId"]) ? (string) $arguments["userId"] :  null,
+                    isset($arguments["userId"]) ? (string) $arguments["userId"] : null,
                     isset($arguments["email"]) ? (string) $arguments["email"] : null
                 )
             ),
@@ -405,7 +413,14 @@ final class Client
         $formatted = array();
 
         foreach ($properties as $name => $value) {
-            if (is_int($value) || is_float($value) || is_string($value) || is_bool($value)) {
+            if (
+                is_int($value) ||
+                is_float($value) ||
+                is_string($value) ||
+                is_bool($value) ||
+                is_array($value) ||
+                is_null($value)
+            ) {
                 $formatted[$name] = $value;
                 continue;
             }
@@ -426,7 +441,7 @@ final class Client
         $payload = [
             "identification" => $this->userIdentifiersToArray(
                 new UserIdentified(
-                    isset($user["userId"]) ? (string) $user["userId"] :  null,
+                    isset($user["userId"]) ? (string) $user["userId"] : null,
                     isset($user["email"]) ? (string) $user["email"] : null
                 )
             ),
@@ -485,7 +500,7 @@ final class Client
         $payload = [
             "identification" => $this->accountIdentifiersToArray(
                 new AccountIdentified(
-                    isset($account["accountId"]) ? (string) $account["accountId"] :  null,
+                    isset($account["accountId"]) ? (string) $account["accountId"] : null,
                     isset($account["domain"]) ? (string) $account["domain"] : null
                 )
             ),
@@ -501,7 +516,7 @@ final class Client
                     return [
                         "identification" => $this->userIdentifiersToArray(
                             new UserIdentified(
-                                isset($user["userId"]) ? (string) $user["userId"] :  null,
+                                isset($user["userId"]) ? (string) $user["userId"] : null,
                                 isset($user["email"]) ? (string) $user["email"] : null
                             )
                         ),

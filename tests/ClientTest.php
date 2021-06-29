@@ -140,6 +140,8 @@ class ClientTest extends TestCase
                         "number" => 22,
                         "date" => $now,
                         "phone" => new PhoneNumber("number"),
+                        "will_be_deleted" => null,
+                        "array_of_values" => ["a", "b"]
                     ],
                 ]
             )
@@ -164,6 +166,8 @@ class ClientTest extends TestCase
                         "number" => 22,
                         "date" => $now->format(DATE_ATOM),
                         "phone" => "number",
+                        "will_be_deleted" => null,
+                        "array_of_values" => ["a", "b"]
                     ],
                 ],
                 $payload
@@ -664,6 +668,19 @@ class ClientTest extends TestCase
         );
     }
 
+    public function test_it_deals_with_forbidden_error()
+    {
+        $factory = new Psr17Factory();
+        $json = '{"message":"the api key is disabled","meta":{"status":403,"requestId":"01ETG3HQ4JY4HNNZ84FBJM3CSC"}}';
+        $http = new HttpClientFixed(new Response(403, [], $json));
+        $client = new Client($http, $factory, $factory, ["apiKey" => "key"]);
+
+        $this->assertEquals(
+            new CallResult(false, false, 0, 0, ["the api key is disabled"], null),
+            $client->addEvent(Event::forUser("login", UserIdentified::byUserId("1")))
+        );
+    }
+
     public function test_it_deals_with_unauthorized_error()
     {
         $factory = new Psr17Factory();
@@ -704,12 +721,12 @@ class ClientTest extends TestCase
     public function test_it_knows_when_rate_limited()
     {
         $factory = new Psr17Factory();
-        $json = '{"message":"The data is correctly stored.","meta":{"status":201,"requestId":"01ETG3HQ4JY4HNNZ84FBJM3CSC"}}';
+        $json = '{"message":"you have sent too much requests","meta":{"status":201,"requestId":"01ETG3HQ4JY4HNNZ84FBJM3CSC"}}';
         $http = new HttpClientFixed(new Response(429, [], $json));
         $client = new Client($http, $factory, $factory, ["apiKey" => "key"]);
 
         $this->assertEquals(
-            new CallResult(false, true, 0, 0, ["rate limited"], null),
+            new CallResult(false, true, 0, 0, ["you have sent too much requests"], null),
             $client->addEvent(Event::forUser("login", UserIdentified::byUserId("1")))
         );
     }

@@ -118,6 +118,9 @@ $call = $client->upsertUser([
         "phone" => "123",
         "registered_at" => new \DateTimeImmutable("..."),
         "is_admin" => true,
+        "key_with_empty_value" => "",
+        "array_of_values" => ["value1", "value2"],
+        "this_property_will_be_deleted" => null,
     ],
 ]);
 ```
@@ -138,6 +141,9 @@ $call = $client->upsertAccount([
         "plan" => "Pro",
         "registered_at" => new \DateTimeImmutable("..."),
         "is_paying" => true,
+        "key_with_empty_value" => "",
+        "array_of_values" => ["value1", "value2"],
+        "this_property_will_be_deleted" => null,
     ],
 
     // optional
