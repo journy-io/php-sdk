@@ -65,14 +65,14 @@ final class Client
     {
         $values = $response->getHeader("x-ratelimit-limit");
 
-        return count($values) > 0 ? (int)$values[0] : 0;
+        return count($values) > 0 ? (int) $values[0] : 0;
     }
 
     private function getRemainingRequests(ResponseInterface $response): int
     {
         $values = $response->getHeader("x-ratelimit-remaining");
 
-        return count($values) > 0 ? (int)$values[0] : 0;
+        return count($values) > 0 ? (int) $values[0] : 0;
     }
 
     private function check(ResponseInterface $response)
@@ -337,8 +337,8 @@ final class Client
             "deviceId" => $arguments["deviceId"],
             "identification" => $this->userIdentifiersToArray(
                 new UserIdentified(
-                    isset($arguments["userId"]) ? (string)$arguments["userId"] : null,
-                    isset($arguments["email"]) ? (string)$arguments["email"] : null
+                    isset($arguments["userId"]) ? (string) $arguments["userId"] : null,
+                    isset($arguments["email"]) ? (string) $arguments["email"] : null
                 )
             ),
         ];
@@ -402,7 +402,7 @@ final class Client
                 continue;
             }
 
-            $formatted[$name] = (string)$value;
+            $formatted[$name] = (string) $value;
         }
 
         return $formatted;
@@ -426,7 +426,7 @@ final class Client
                 continue;
             }
 
-            $formatted[$name] = (string)$value;
+            $formatted[$name] = (string) $value;
         }
 
         return $formatted;
@@ -437,8 +437,8 @@ final class Client
         $payload = [
             "identification" => $this->userIdentifiersToArray(
                 new UserIdentified(
-                    isset($user["userId"]) ? (string)$user["userId"] : null,
-                    isset($user["email"]) ? (string)$user["email"] : null
+                    isset($user["userId"]) ? (string) $user["userId"] : null,
+                    isset($user["email"]) ? (string) $user["email"] : null
                 )
             ),
         ];
@@ -496,8 +496,8 @@ final class Client
         $payload = [
             "identification" => $this->accountIdentifiersToArray(
                 new AccountIdentified(
-                    isset($account["accountId"]) ? (string)$account["accountId"] : null,
-                    isset($account["domain"]) ? (string)$account["domain"] : null
+                    isset($account["accountId"]) ? (string) $account["accountId"] : null,
+                    isset($account["domain"]) ? (string) $account["domain"] : null
                 )
             ),
         ];
@@ -512,8 +512,8 @@ final class Client
                     return [
                         "identification" => $this->userIdentifiersToArray(
                             new UserIdentified(
-                                isset($user["userId"]) ? (string)$user["userId"] : null,
-                                isset($user["email"]) ? (string)$user["email"] : null
+                                isset($user["userId"]) ? (string) $user["userId"] : null,
+                                isset($user["email"]) ? (string) $user["email"] : null
                             )
                         ),
                     ];
