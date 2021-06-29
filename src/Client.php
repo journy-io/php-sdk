@@ -77,10 +77,10 @@ final class Client
 
     private function check(ResponseInterface $response)
     {
-        if ($response->getStatusCode() === 401) {
-            $response->getBody()->rewind();
-            $json = json_decode($response->getBody()->getContents(), true);
+        $response->getBody()->rewind();
+        $json = json_decode($response->getBody()->getContents(), true);
 
+        if ($response->getStatusCode() === 401) {
             return new CallResult(
                 false,
                 false,
@@ -96,7 +96,7 @@ final class Client
                 false,
                 $this->getRemainingRequests($response),
                 $this->getMaxRequests($response),
-                ["the api key is disabled"]
+                [$json["message"]]
             );
         }
 
@@ -116,7 +116,7 @@ final class Client
                 true,
                 $this->getRemainingRequests($response),
                 $this->getMaxRequests($response),
-                ["rate limited"]
+                [$json["message"]]
             );
         }
     }
