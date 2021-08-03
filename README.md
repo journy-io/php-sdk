@@ -165,10 +165,7 @@ $call = $client->addUsersToAccount([
 
 #### Remove user(s) from an account
 
-Please note that journy.io makes a difference between removing and deleting:
-
-- Removing: when removing a user, the user will still be stored but marked as "removed".
-- Deleting: when deleting an user, the user will not be stored anymore.
+When removing a user, the user will still be stored in journy.io, but marked as "removed".
 
 ```php
 $call = $client->removeUsersFromAccount([
