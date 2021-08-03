@@ -340,6 +340,94 @@ class ClientTest extends TestCase
         }
     }
 
+    public function test_it_adds_users_to_account()
+    {
+        $factory = new Psr17Factory();
+        $json = '{"message":"Users will be added.","meta":{"status":201,"requestId":"01ETG3HQ4JY4HNNZ84FBJM3CSC"}}';
+        $http = new HttpClientFixed(new Response(201, [], $json));
+        $client = new Client($http, $factory, $factory, ["apiKey" => "key"]);
+        $now = new DateTimeImmutable("now");
+
+        $this->assertEquals(
+            new CallResult(true, false, 0, 0, [], null),
+            $client->addUsersToAccount(
+                [
+                    "account" => [
+                        "domain" => "journy.io",
+                    ],
+                    "users" => [
+                        ["userId" => "1"],
+                        ["userId" => "2"],
+                    ],
+                ]
+            )
+        );
+
+        $request = $http->getLastRequest();
+        $this->assertInstanceOf(RequestInterface::class, $request);
+        if ($request instanceof RequestInterface) {
+            $request->getBody()->rewind();
+            $body = $request->getBody()->getContents();
+            $payload = json_decode($body, true);
+            $this->assertEquals(
+                [
+                    "account" => [
+                        "domain" => "journy.io",
+                    ],
+                    "users" => [
+                        ["userId" => "1"],
+                        ["userId" => "2"],
+                    ],
+                ],
+                $payload
+            );
+        }
+    }
+
+    public function test_it_removes_users_from_account()
+    {
+        $factory = new Psr17Factory();
+        $json = '{"message":"Users will be removed.","meta":{"status":204,"requestId":"01ETG3HQ4JY4HNNZ84FBJM3CSC"}}';
+        $http = new HttpClientFixed(new Response(204, [], $json));
+        $client = new Client($http, $factory, $factory, ["apiKey" => "key"]);
+        $now = new DateTimeImmutable("now");
+
+        $this->assertEquals(
+            new CallResult(true, false, 0, 0, [], null),
+            $client->removeUsersFromAccount(
+                [
+                    "account" => [
+                        "domain" => "journy.io",
+                    ],
+                    "users" => [
+                        ["userId" => "1"],
+                        ["userId" => "2"],
+                    ],
+                ]
+            )
+        );
+
+        $request = $http->getLastRequest();
+        $this->assertInstanceOf(RequestInterface::class, $request);
+        if ($request instanceof RequestInterface) {
+            $request->getBody()->rewind();
+            $body = $request->getBody()->getContents();
+            $payload = json_decode($body, true);
+            $this->assertEquals(
+                [
+                    "account" => [
+                        "domain" => "journy.io",
+                    ],
+                    "users" => [
+                        ["userId" => "1"],
+                        ["userId" => "2"],
+                    ],
+                ],
+                $payload
+            );
+        }
+    }
+
     public function test_it_deals_with_sparse_arrays()
     {
         $factory = new Psr17Factory();

@@ -569,4 +569,136 @@ final class Client
             null
         );
     }
+
+    public function addUsersToAccount(array $arguments): CallResult
+    {
+        $payload = [
+            "account" => $this->accountIdentifiersToArray(
+                new AccountIdentified(
+                    isset($arguments["account"]["accountId"]) ? (string) $arguments["account"]["accountId"] : null,
+                    isset($arguments["account"]["domain"]) ? (string) $arguments["account"]["domain"] : null
+                )
+            ),
+            "users" => array_map(
+                function (array $user) {
+                    return $this->userIdentifiersToArray(
+                        new UserIdentified(
+                            isset($user["userId"]) ? (string) $user["userId"] : null,
+                            isset($user["email"]) ? (string) $user["email"] : null
+                        )
+                    );
+                },
+                array_values($arguments["users"])
+            )
+        ];
+
+        $body = $this->streamFactory->createStream(json_encode($payload));
+
+        $response = $this->http->sendRequest(
+            $this->withAuthentication(
+                $this->requestFactory
+                    ->createRequest(
+                        "POST",
+                        new Uri("{$this->rootUrl}/accounts/users/add")
+                    )
+                    ->withHeader("content-type", "application/json")
+                    ->withBody($body)
+            )
+        );
+
+        $result = $this->check($response);
+
+        if ($result) {
+            return $result;
+        }
+
+        $response->getBody()->rewind();
+        $json = json_decode($response->getBody()->getContents(), true);
+
+        if ($response->getStatusCode() === 201) {
+            return new CallResult(
+                true,
+                false,
+                $this->getRemainingRequests($response),
+                $this->getMaxRequests($response),
+                [],
+                null
+            );
+        }
+
+        return new CallResult(
+            false,
+            false,
+            $this->getRemainingRequests($response),
+            $this->getMaxRequests($response),
+            $json['errors'] ?: [],
+            null
+        );
+    }
+
+    public function removeUsersFromAccount(array $arguments): CallResult
+    {
+        $payload = [
+            "account" => $this->accountIdentifiersToArray(
+                new AccountIdentified(
+                    isset($arguments["account"]["accountId"]) ? (string) $arguments["account"]["accountId"] : null,
+                    isset($arguments["account"]["domain"]) ? (string) $arguments["account"]["domain"] : null
+                )
+            ),
+            "users" => array_map(
+                function (array $user) {
+                    return $this->userIdentifiersToArray(
+                        new UserIdentified(
+                            isset($user["userId"]) ? (string) $user["userId"] : null,
+                            isset($user["email"]) ? (string) $user["email"] : null
+                        )
+                    );
+                },
+                array_values($arguments["users"])
+            )
+        ];
+
+        $body = $this->streamFactory->createStream(json_encode($payload));
+
+        $response = $this->http->sendRequest(
+            $this->withAuthentication(
+                $this->requestFactory
+                    ->createRequest(
+                        "POST",
+                        new Uri("{$this->rootUrl}/accounts/users/remove")
+                    )
+                    ->withHeader("content-type", "application/json")
+                    ->withBody($body)
+            )
+        );
+
+        $result = $this->check($response);
+
+        if ($result) {
+            return $result;
+        }
+
+        $response->getBody()->rewind();
+        $json = json_decode($response->getBody()->getContents(), true);
+
+        if ($response->getStatusCode() === 204) {
+            return new CallResult(
+                true,
+                false,
+                $this->getRemainingRequests($response),
+                $this->getMaxRequests($response),
+                [],
+                null
+            );
+        }
+
+        return new CallResult(
+            false,
+            false,
+            $this->getRemainingRequests($response),
+            $this->getMaxRequests($response),
+            $json['errors'] ?: [],
+            null
+        );
+    }
 }
