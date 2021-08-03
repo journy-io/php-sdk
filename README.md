@@ -145,12 +145,6 @@ $call = $client->upsertAccount([
         "array_of_values" => ["value1", "value2"],
         "this_property_will_be_deleted" => null,
     ],
-
-    // optional
-    "members" => [
-        ["userId" => "1"], // Unique identifier for the user in your database
-        ["userId" => "2"]
-    ],
 ]);
 ```
 

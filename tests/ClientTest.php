@@ -242,10 +242,6 @@ class ClientTest extends TestCase
                         "number" => 22,
                         "date" => $now,
                     ],
-                    "members" => [
-                        ["userId" => "1"],
-                        ["userId" => "2"],
-                    ],
                 ]
             )
         );
@@ -267,14 +263,6 @@ class ClientTest extends TestCase
                         "boolean" => true,
                         "number" => 22,
                         "date" => $now->format(DATE_ATOM),
-                    ],
-                    "members" => [
-                        [
-                            "identification" => ["userId" => "1"],
-                        ],
-                        [
-                            "identification" => ["userId" => "2"],
-                        ],
                     ],
                 ],
                 $payload
@@ -301,10 +289,6 @@ class ClientTest extends TestCase
                         "number" => 22,
                         "date" => $now,
                     ],
-                    "members" => [
-                        ["userId" => "1"],
-                        ["userId" => "2"],
-                    ],
                 ]
             )
         );
@@ -325,14 +309,6 @@ class ClientTest extends TestCase
                         "boolean" => true,
                         "number" => 22,
                         "date" => $now->format(DATE_ATOM),
-                    ],
-                    "members" => [
-                        [
-                            "identification" => ["userId" => "1"],
-                        ],
-                        [
-                            "identification" => ["userId" => "2"],
-                        ],
                     ],
                 ],
                 $payload
@@ -439,10 +415,6 @@ class ClientTest extends TestCase
             $client->upsertAccount(
                 [
                     "accountId" => "1",
-                    "members" => [
-                        1 => ["userId" => "1"],
-                        2 => ["userId" => "2"],
-                    ],
                 ]
             )
         );
@@ -457,14 +429,6 @@ class ClientTest extends TestCase
                 [
                     "identification" => [
                         "accountId" => "1",
-                    ],
-                    "members" => [
-                        [
-                            "identification" => ["userId" => "1"],
-                        ],
-                        [
-                            "identification" => ["userId" => "2"],
-                        ],
                     ],
                 ],
                 $payload
