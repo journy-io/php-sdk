@@ -154,6 +154,41 @@ $call = $client->upsertAccount([
 ]);
 ```
 
+#### Add user(s) to an account
+
+```php
+$call = $client->addUsersToAccount([
+    "account" => [
+        "accountId" => "accountId",
+        "domain" => "acme-inc.com",
+        ],
+    "users" => [
+        ["userId" => "1"], // Unique identifier for the user in your database
+        ["userId" => "2"]
+    ],
+]);
+```
+
+#### Remove user(s) from an account
+
+Please note that journy.io makes a difference between removing and deleting:
+
+- Removing: when removing a user, the user will still be stored but marked as "removed".
+- Deleting: when deleting an user, the user will not be stored anymore.
+
+```php
+$call = $client->removeUsersFromAccount([
+    "account" => [
+        "accountId" => "accountId",
+        "domain" => "acme-inc.com",
+        ],
+    "users" => [
+        ["userId" => "1"], // Unique identifier for the user in your database
+        ["userId" => "2"]
+    ],
+]);
+```
+
 #### Link web visitor to a user
 
 You can link a web visitor to a user in your application when you have our snippet installed on your website. The snippet sets a cookie named `__journey`. If the cookie exists, you can link the web visitor to the user that is currently logged in:
