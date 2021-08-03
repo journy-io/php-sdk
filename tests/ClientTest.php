@@ -346,7 +346,6 @@ class ClientTest extends TestCase
         $json = '{"message":"Users will be added.","meta":{"status":201,"requestId":"01ETG3HQ4JY4HNNZ84FBJM3CSC"}}';
         $http = new HttpClientFixed(new Response(201, [], $json));
         $client = new Client($http, $factory, $factory, ["apiKey" => "key"]);
-        $now = new DateTimeImmutable("now");
 
         $this->assertEquals(
             new CallResult(true, false, 0, 0, [], null),
@@ -390,7 +389,6 @@ class ClientTest extends TestCase
         $json = '{"message":"Users will be removed.","meta":{"status":204,"requestId":"01ETG3HQ4JY4HNNZ84FBJM3CSC"}}';
         $http = new HttpClientFixed(new Response(204, [], $json));
         $client = new Client($http, $factory, $factory, ["apiKey" => "key"]);
-        $now = new DateTimeImmutable("now");
 
         $this->assertEquals(
             new CallResult(true, false, 0, 0, [], null),
