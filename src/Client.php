@@ -556,6 +556,13 @@ final class Client
 
     public function addUsersToAccount(array $arguments): CallResult
     {
+        if (!isset($arguments["account"])) {
+            throw new InvalidArgumentException("Account can not be empty!");
+        }
+        if (!isset($arguments["users"])) {
+            throw new InvalidArgumentException("Users can not be empty!");
+        }
+
         $payload = [
             "account" => $this->accountIdentifiersToArray(
                 new AccountIdentified(
@@ -622,6 +629,13 @@ final class Client
 
     public function removeUsersFromAccount(array $arguments): CallResult
     {
+        if (!isset($arguments["account"])) {
+            throw new InvalidArgumentException("Account can not be empty!");
+        }
+        if (!isset($arguments["users"])) {
+            throw new InvalidArgumentException("Users can not be empty!");
+        }
+
         $payload = [
             "account" => $this->accountIdentifiersToArray(
                 new AccountIdentified(
