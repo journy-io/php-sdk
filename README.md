@@ -155,7 +155,7 @@ $call = $client->addUsersToAccount([
     "account" => [
         "accountId" => "accountId",
         "domain" => "acme-inc.com",
-        ],
+    ],
     "users" => [
         ["userId" => "1"], // Unique identifier for the user in your database
         ["userId" => "2"]
@@ -172,7 +172,7 @@ $call = $client->removeUsersFromAccount([
     "account" => [
         "accountId" => "accountId",
         "domain" => "acme-inc.com",
-        ],
+    ],
     "users" => [
         ["userId" => "1"], // Unique identifier for the user in your database
         ["userId" => "2"]
