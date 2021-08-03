@@ -145,12 +145,6 @@ $call = $client->upsertAccount([
         "array_of_values" => ["value1", "value2"],
         "this_property_will_be_deleted" => null,
     ],
-
-    // optional
-    "members" => [
-        ["userId" => "1"], // Unique identifier for the user in your database
-        ["userId" => "2"]
-    ],
 ]);
 ```
 
@@ -161,7 +155,7 @@ $call = $client->addUsersToAccount([
     "account" => [
         "accountId" => "accountId",
         "domain" => "acme-inc.com",
-        ],
+    ],
     "users" => [
         ["userId" => "1"], // Unique identifier for the user in your database
         ["userId" => "2"]
@@ -171,17 +165,14 @@ $call = $client->addUsersToAccount([
 
 #### Remove user(s) from an account
 
-Please note that journy.io makes a difference between removing and deleting:
-
-- Removing: when removing a user, the user will still be stored but marked as "removed".
-- Deleting: when deleting an user, the user will not be stored anymore.
+When removing a user, the user will still be stored in journy.io, but marked as "removed".
 
 ```php
 $call = $client->removeUsersFromAccount([
     "account" => [
         "accountId" => "accountId",
         "domain" => "acme-inc.com",
-        ],
+    ],
     "users" => [
         ["userId" => "1"], // Unique identifier for the user in your database
         ["userId" => "2"]

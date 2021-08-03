@@ -510,22 +510,6 @@ final class Client
             $payload["properties"] = $this->formatProperties($account["properties"]);
         }
 
-        if (isset($account["members"]) && is_array($account["members"])) {
-            $payload["members"] = array_map(
-                function (array $user) {
-                    return [
-                        "identification" => $this->userIdentifiersToArray(
-                            new UserIdentified(
-                                isset($user["userId"]) ? (string) $user["userId"] : null,
-                                isset($user["email"]) ? (string) $user["email"] : null
-                            )
-                        ),
-                    ];
-                },
-                array_values($account["members"])
-            );
-        }
-
         $body = $this->streamFactory->createStream(json_encode($payload));
 
         $response = $this->http->sendRequest(
@@ -572,6 +556,13 @@ final class Client
 
     public function addUsersToAccount(array $arguments): CallResult
     {
+        if (!isset($arguments["account"])) {
+            throw new InvalidArgumentException("Account can not be empty!");
+        }
+        if (!isset($arguments["users"])) {
+            throw new InvalidArgumentException("Users can not be empty!");
+        }
+
         $payload = [
             "account" => $this->accountIdentifiersToArray(
                 new AccountIdentified(
@@ -638,6 +629,13 @@ final class Client
 
     public function removeUsersFromAccount(array $arguments): CallResult
     {
+        if (!isset($arguments["account"])) {
+            throw new InvalidArgumentException("Account can not be empty!");
+        }
+        if (!isset($arguments["users"])) {
+            throw new InvalidArgumentException("Users can not be empty!");
+        }
+
         $payload = [
             "account" => $this->accountIdentifiersToArray(
                 new AccountIdentified(
