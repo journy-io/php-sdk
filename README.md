@@ -145,9 +145,35 @@ $call = $client->upsertAccount([
         "array_of_values" => ["value1", "value2"],
         "this_property_will_be_deleted" => null,
     ],
+]);
+```
 
-    // optional
-    "members" => [
+#### Add user(s) to an account
+
+```php
+$call = $client->addUsersToAccount([
+    "account" => [
+        "accountId" => "accountId",
+        "domain" => "acme-inc.com",
+    ],
+    "users" => [
+        ["userId" => "1"], // Unique identifier for the user in your database
+        ["userId" => "2"]
+    ],
+]);
+```
+
+#### Remove user(s) from an account
+
+When removing a user, the user will still be stored in journy.io, but marked as "removed".
+
+```php
+$call = $client->removeUsersFromAccount([
+    "account" => [
+        "accountId" => "accountId",
+        "domain" => "acme-inc.com",
+    ],
+    "users" => [
         ["userId" => "1"], // Unique identifier for the user in your database
         ["userId" => "2"]
     ],
