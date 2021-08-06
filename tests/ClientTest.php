@@ -279,6 +279,7 @@ class ClientTest extends TestCase
                 ],
                 $payload
             );
+            $this->assertEquals(["php-sdk/dev-main"], $request->getHeader("user-agent"));
         }
     }
 
