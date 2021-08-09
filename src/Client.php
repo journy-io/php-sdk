@@ -9,7 +9,6 @@ use DateTimeInterface;
 use InvalidArgumentException;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use Nyholm\Psr7\Uri;
-use PackageVersions\Versions;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\RequestInterface;
@@ -48,7 +47,7 @@ final class Client
         $this->streamFactory = $streamFactory;
         $this->apiKey = $config["apiKey"];
         $this->rootUrl = $config["rootUrl"] ?? "https://api.journy.io";
-        $this->version = explode("@", Versions::getVersion('journy-io/sdk'))[0];
+        $this->version = \Composer\InstalledVersions::getVersion('journy-io/sdk');
     }
 
     public static function withDefaults(string $apiKey): Client
