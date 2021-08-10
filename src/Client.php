@@ -22,6 +22,7 @@ final class Client
     private $streamFactory;
     private $apiKey;
     private $rootUrl;
+    private $version;
 
     public function __construct(
         ClientInterface $http,
@@ -46,6 +47,7 @@ final class Client
         $this->streamFactory = $streamFactory;
         $this->apiKey = $config["apiKey"];
         $this->rootUrl = $config["rootUrl"] ?? "https://api.journy.io";
+        $this->version = \Composer\InstalledVersions::getVersion('journy-io/sdk');
     }
 
     public static function withDefaults(string $apiKey): Client
@@ -54,6 +56,11 @@ final class Client
         $http = new Curl($factory, ["timeout" => 5]);
 
         return new Client($http, $factory, $factory, ["apiKey" => $apiKey]);
+    }
+
+    private function withUserAgent(RequestInterface $request): RequestInterface
+    {
+        return $request->withAddedHeader("user-agent", "php-sdk/" . $this->version);
     }
 
     private function withAuthentication(RequestInterface $request): RequestInterface
@@ -125,9 +132,11 @@ final class Client
     {
         $response = $this->http->sendRequest(
             $this->withAuthentication(
-                $this->requestFactory->createRequest(
-                    "GET",
-                    new Uri("{$this->rootUrl}/validate")
+                $this->withUserAgent(
+                    $this->requestFactory->createRequest(
+                        "GET",
+                        new Uri("{$this->rootUrl}/validate")
+                    )
                 )
             )
         );
@@ -171,9 +180,11 @@ final class Client
         $encodedDomain = urlencode($domain);
         $response = $this->http->sendRequest(
             $this->withAuthentication(
-                $this->requestFactory->createRequest(
-                    "GET",
-                    new Uri("{$this->rootUrl}/tracking/snippet?domain={$encodedDomain}")
+                $this->withUserAgent(
+                    $this->requestFactory->createRequest(
+                        "GET",
+                        new Uri("{$this->rootUrl}/tracking/snippet?domain={$encodedDomain}")
+                    )
                 )
             )
         );
@@ -287,13 +298,15 @@ final class Client
 
         $response = $this->http->sendRequest(
             $this->withAuthentication(
-                $this->requestFactory
-                    ->createRequest(
-                        "POST",
-                        new Uri("{$this->rootUrl}/events")
-                    )
-                    ->withHeader("content-type", "application/json")
-                    ->withBody($body)
+                $this->withUserAgent(
+                    $this->requestFactory
+                        ->createRequest(
+                            "POST",
+                            new Uri("{$this->rootUrl}/events")
+                        )
+                        ->withHeader("content-type", "application/json")
+                        ->withBody($body)
+                )
             )
         );
 
@@ -347,13 +360,15 @@ final class Client
 
         $response = $this->http->sendRequest(
             $this->withAuthentication(
-                $this->requestFactory
-                    ->createRequest(
-                        "POST",
-                        new Uri("{$this->rootUrl}/link")
-                    )
-                    ->withHeader("content-type", "application/json")
-                    ->withBody($body)
+                $this->withUserAgent(
+                    $this->requestFactory
+                        ->createRequest(
+                            "POST",
+                            new Uri("{$this->rootUrl}/link")
+                        )
+                        ->withHeader("content-type", "application/json")
+                        ->withBody($body)
+                )
             )
         );
 
@@ -455,13 +470,15 @@ final class Client
 
         $response = $this->http->sendRequest(
             $this->withAuthentication(
-                $this->requestFactory
-                    ->createRequest(
-                        "POST",
-                        new Uri("{$this->rootUrl}/users/upsert")
-                    )
-                    ->withHeader("content-type", "application/json")
-                    ->withBody($body)
+                $this->withUserAgent(
+                    $this->requestFactory
+                        ->createRequest(
+                            "POST",
+                            new Uri("{$this->rootUrl}/users/upsert")
+                        )
+                        ->withHeader("content-type", "application/json")
+                        ->withBody($body)
+                )
             )
         );
 
@@ -514,13 +531,15 @@ final class Client
 
         $response = $this->http->sendRequest(
             $this->withAuthentication(
-                $this->requestFactory
-                    ->createRequest(
-                        "POST",
-                        new Uri("{$this->rootUrl}/accounts/upsert")
-                    )
-                    ->withHeader("content-type", "application/json")
-                    ->withBody($body)
+                $this->withUserAgent(
+                    $this->requestFactory
+                        ->createRequest(
+                            "POST",
+                            new Uri("{$this->rootUrl}/accounts/upsert")
+                        )
+                        ->withHeader("content-type", "application/json")
+                        ->withBody($body)
+                )
             )
         );
 
@@ -587,13 +606,15 @@ final class Client
 
         $response = $this->http->sendRequest(
             $this->withAuthentication(
-                $this->requestFactory
-                    ->createRequest(
-                        "POST",
-                        new Uri("{$this->rootUrl}/accounts/users/add")
-                    )
-                    ->withHeader("content-type", "application/json")
-                    ->withBody($body)
+                $this->withUserAgent(
+                    $this->requestFactory
+                        ->createRequest(
+                            "POST",
+                            new Uri("{$this->rootUrl}/accounts/users/add")
+                        )
+                        ->withHeader("content-type", "application/json")
+                        ->withBody($body)
+                )
             )
         );
 
@@ -660,13 +681,15 @@ final class Client
 
         $response = $this->http->sendRequest(
             $this->withAuthentication(
-                $this->requestFactory
-                    ->createRequest(
-                        "POST",
-                        new Uri("{$this->rootUrl}/accounts/users/remove")
-                    )
-                    ->withHeader("content-type", "application/json")
-                    ->withBody($body)
+                $this->withUserAgent(
+                    $this->requestFactory
+                        ->createRequest(
+                            "POST",
+                            new Uri("{$this->rootUrl}/accounts/users/remove")
+                        )
+                        ->withHeader("content-type", "application/json")
+                        ->withBody($body)
+                )
             )
         );
 
