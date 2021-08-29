@@ -591,12 +591,12 @@ final class Client
             ),
             "users" => array_map(
                 function (array $user) {
-                    return $this->userIdentifiersToArray(
+                    return ["identification" => $this->userIdentifiersToArray(
                         new UserIdentified(
                             isset($user["userId"]) ? (string) $user["userId"] : null,
                             isset($user["email"]) ? (string) $user["email"] : null
                         )
-                    );
+                    )];
                 },
                 array_values($arguments["users"])
             )
@@ -666,12 +666,12 @@ final class Client
             ),
             "users" => array_map(
                 function (array $user) {
-                    return $this->userIdentifiersToArray(
+                    return ["identification" => $this->userIdentifiersToArray(
                         new UserIdentified(
                             isset($user["userId"]) ? (string) $user["userId"] : null,
                             isset($user["email"]) ? (string) $user["email"] : null
                         )
-                    );
+                    )];
                 },
                 array_values($arguments["users"])
             )

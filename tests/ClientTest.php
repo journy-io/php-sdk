@@ -352,8 +352,8 @@ class ClientTest extends TestCase
                         "domain" => "journy.io",
                     ],
                     "users" => [
-                        ["userId" => "1"],
-                        ["userId" => "2"],
+                        ["identification" => ["userId" => "1"]],
+                        ["identification" => ["userId" => "2"]],
                     ],
                 ],
                 $payload
@@ -395,8 +395,8 @@ class ClientTest extends TestCase
                         "domain" => "journy.io",
                     ],
                     "users" => [
-                        ["userId" => "1"],
-                        ["userId" => "2"],
+                        ["identification" => ["userId" => "1"]],
+                        ["identification" => ["userId" => "2"]],
                     ],
                 ],
                 $payload
