@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace JournyIO\SDK;
 
 use Buzz\Client\Curl;
+use Composer\InstalledVersions;
 use DateTimeInterface;
 use InvalidArgumentException;
 use Nyholm\Psr7\Factory\Psr17Factory;
@@ -47,7 +48,7 @@ final class Client
         $this->streamFactory = $streamFactory;
         $this->apiKey = $config["apiKey"];
         $this->rootUrl = $config["rootUrl"] ?? "https://api.journy.io";
-        $this->version = \Composer\InstalledVersions::getVersion('journy-io/sdk');
+        $this->version = InstalledVersions::getPrettyVersion('journy-io/sdk');
     }
 
     public static function withDefaults(string $apiKey): Client
