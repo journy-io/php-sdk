@@ -178,8 +178,8 @@ class ClientTest extends TestCase
     public function test_it_deletes_user()
     {
         $factory = new Psr17Factory();
-        $json = '{"message":"The data is correctly stored.","meta":{"status":201,"requestId":"01ETG3HQ4JY4HNNZ84FBJM3CSC"}}';
-        $http = new HttpClientFixed(new Response(201, [], $json));
+        $json = '{"message":"The data is correctly stored.","meta":{"status":202,"requestId":"01ETG3HQ4JY4HNNZ84FBJM3CSC"}}';
+        $http = new HttpClientFixed(new Response(202, [], $json));
         $client = new Client($http, $factory, $factory, ["apiKey" => "key"]);
         $now = new DateTimeImmutable("now");
 
@@ -215,8 +215,8 @@ class ClientTest extends TestCase
     public function test_it_deletes_user_without_user_id()
     {
         $factory = new Psr17Factory();
-        $json = '{"message":"The data is correctly stored.","meta":{"status":201,"requestId":"01ETG3HQ4JY4HNNZ84FBJM3CSC"}}';
-        $http = new HttpClientFixed(new Response(201, [], $json));
+        $json = '{"message":"The data is correctly stored.","meta":{"status":202,"requestId":"01ETG3HQ4JY4HNNZ84FBJM3CSC"}}';
+        $http = new HttpClientFixed(new Response(202, [], $json));
         $client = new Client($http, $factory, $factory, ["apiKey" => "key"]);
         $now = new DateTimeImmutable("now");
 
@@ -250,8 +250,8 @@ class ClientTest extends TestCase
     public function test_it_deletes_user_without_email()
     {
         $factory = new Psr17Factory();
-        $json = '{"message":"The data is correctly stored.","meta":{"status":201,"requestId":"01ETG3HQ4JY4HNNZ84FBJM3CSC"}}';
-        $http = new HttpClientFixed(new Response(201, [], $json));
+        $json = '{"message":"The data is correctly stored.","meta":{"status":202,"requestId":"01ETG3HQ4JY4HNNZ84FBJM3CSC"}}';
+        $http = new HttpClientFixed(new Response(202, [], $json));
         $client = new Client($http, $factory, $factory, ["apiKey" => "key"]);
         $now = new DateTimeImmutable("now");
 
@@ -428,8 +428,8 @@ class ClientTest extends TestCase
     public function test_it_deletes_account()
     {
         $factory = new Psr17Factory();
-        $json = '{"message":"The data is correctly stored.","meta":{"status":201,"requestId":"01ETG3HQ4JY4HNNZ84FBJM3CSC"}}';
-        $http = new HttpClientFixed(new Response(201, [], $json));
+        $json = '{"message":"The data is correctly stored.","meta":{"status":202,"requestId":"01ETG3HQ4JY4HNNZ84FBJM3CSC"}}';
+        $http = new HttpClientFixed(new Response(202, [], $json));
         $client = new Client($http, $factory, $factory, ["apiKey" => "key"]);
         $now = new DateTimeImmutable("now");
 
@@ -466,8 +466,8 @@ class ClientTest extends TestCase
     public function test_it_deletes_account_without_account_id()
     {
         $factory = new Psr17Factory();
-        $json = '{"message":"The data is correctly stored.","meta":{"status":201,"requestId":"01ETG3HQ4JY4HNNZ84FBJM3CSC"}}';
-        $http = new HttpClientFixed(new Response(201, [], $json));
+        $json = '{"message":"The data is correctly stored.","meta":{"status":202,"requestId":"01ETG3HQ4JY4HNNZ84FBJM3CSC"}}';
+        $http = new HttpClientFixed(new Response(202, [], $json));
         $client = new Client($http, $factory, $factory, ["apiKey" => "key"]);
         $now = new DateTimeImmutable("now");
 
@@ -500,8 +500,8 @@ class ClientTest extends TestCase
     public function test_it_deletes_account_without_domain()
     {
         $factory = new Psr17Factory();
-        $json = '{"message":"The data is correctly stored.","meta":{"status":201,"requestId":"01ETG3HQ4JY4HNNZ84FBJM3CSC"}}';
-        $http = new HttpClientFixed(new Response(201, [], $json));
+        $json = '{"message":"The data is correctly stored.","meta":{"status":202,"requestId":"01ETG3HQ4JY4HNNZ84FBJM3CSC"}}';
+        $http = new HttpClientFixed(new Response(202, [], $json));
         $client = new Client($http, $factory, $factory, ["apiKey" => "key"]);
         $now = new DateTimeImmutable("now");
 
