@@ -24,9 +24,8 @@ If your app doesn't have these yet installed, we recommend:
 composer require kriswallsmith/buzz nyholm/psr7
 ```
 
-* [https://github.com/kriswallsmith/Buzz](https://github.com/kriswallsmith/Buzz)
-* [https://github.com/Nyholm/psr7](https://github.com/Nyholm/psr7)
-
+-   [https://github.com/kriswallsmith/Buzz](https://github.com/kriswallsmith/Buzz)
+-   [https://github.com/Nyholm/psr7](https://github.com/Nyholm/psr7)
 
 ## 🔌 Getting started
 
@@ -36,7 +35,7 @@ To be able to use the SDK you need to generate an API key. If you don't have one
 
 If you don't have an account yet, you can create one in [journy.io](https://system.journy.io/register?utm_source=github&utm_content=readme-php-sdk) or [request a demo first](https://www.journy.io/book-demo?utm_source=github&utm_content=readme-php-sdk).
 
-Go to your settings, under the *Connections*-tab, to create and edit API keys. Make sure to give the correct permissions to the API Key.
+Go to your settings, under the _Connections_-tab, to create and edit API keys. Make sure to give the correct permissions to the API Key.
 
 ```php
 use JournyIO\SDK\Client;
@@ -125,6 +124,16 @@ $call = $client->upsertUser([
 ]);
 ```
 
+#### Delete user
+
+```php
+$call = $client->deleteUser([
+    // Must provide either an email address or userId or both
+    "userId" => "userId", // Unique identifier for the user in your database
+    "email" => "name@domain.tld",
+]);
+```
+
 #### Create or update account
 
 Note: `name`, `mrr`, `plan` and `registered_at` are default properties
@@ -145,6 +154,16 @@ $call = $client->upsertAccount([
         "array_of_values" => ["value1", "value2"],
         "this_property_will_be_deleted" => null,
     ],
+]);
+```
+
+#### Delete account
+
+```php
+$call = $client->deleteAccount([
+    // Must provide either a domain or accountId or both
+    "accountId" => "accountId", // Unique identifier for the account in your database
+    "domain" => "acme-inc.com",
 ]);
 ```
 
@@ -269,4 +288,3 @@ Please create an issue or contact us via the chat on our website.
 ## 🔒 Security
 
 If you discover any security related issues, please email security at journy io instead of using the issue tracker.
-

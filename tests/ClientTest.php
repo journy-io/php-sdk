@@ -175,6 +175,113 @@ class ClientTest extends TestCase
         }
     }
 
+    public function test_it_deletes_user()
+    {
+        $factory = new Psr17Factory();
+        $json = '{"message":"The data is correctly stored.","meta":{"status":202,"requestId":"01ETG3HQ4JY4HNNZ84FBJM3CSC"}}';
+        $http = new HttpClientFixed(new Response(202, [], $json));
+        $client = new Client($http, $factory, $factory, ["apiKey" => "key"]);
+        $now = new DateTimeImmutable("now");
+
+        $this->assertEquals(
+            new CallResult(true, false, 0, 0, [], null),
+            $client->deleteUser(
+                [
+                    "userId" => "1",
+                    "email" => new Email("hans@journy.io"),
+                ]
+            )
+        );
+
+        $request = $http->getLastRequest();
+        $this->assertInstanceOf(RequestInterface::class, $request);
+
+        if ($request instanceof RequestInterface) {
+            $request->getBody()->rewind();
+            $body = $request->getBody()->getContents();
+            $payload = json_decode($body, true);
+            $this->assertEquals(
+                [
+                    "identification" => [
+                        "userId" => "1",
+                        "email" => "hans@journy.io",
+                    ],
+                ],
+                $payload
+            );
+        }
+    }
+
+    public function test_it_deletes_user_without_user_id()
+    {
+        $factory = new Psr17Factory();
+        $json = '{"message":"The data is correctly stored.","meta":{"status":202,"requestId":"01ETG3HQ4JY4HNNZ84FBJM3CSC"}}';
+        $http = new HttpClientFixed(new Response(202, [], $json));
+        $client = new Client($http, $factory, $factory, ["apiKey" => "key"]);
+        $now = new DateTimeImmutable("now");
+
+        $this->assertEquals(
+            new CallResult(true, false, 0, 0, [], null),
+            $client->deleteUser(
+                [
+                    "email" => "hans@journy.io",
+                ]
+            )
+        );
+
+        $request = $http->getLastRequest();
+        $this->assertInstanceOf(RequestInterface::class, $request);
+
+        if ($request instanceof RequestInterface) {
+            $request->getBody()->rewind();
+            $body = $request->getBody()->getContents();
+            $payload = json_decode($body, true);
+            $this->assertEquals(
+                [
+                    "identification" => [
+                        "email" => "hans@journy.io",
+                    ],
+                ],
+                $payload
+            );
+        }
+    }
+
+    public function test_it_deletes_user_without_email()
+    {
+        $factory = new Psr17Factory();
+        $json = '{"message":"The data is correctly stored.","meta":{"status":202,"requestId":"01ETG3HQ4JY4HNNZ84FBJM3CSC"}}';
+        $http = new HttpClientFixed(new Response(202, [], $json));
+        $client = new Client($http, $factory, $factory, ["apiKey" => "key"]);
+        $now = new DateTimeImmutable("now");
+
+        $this->assertEquals(
+            new CallResult(true, false, 0, 0, [], null),
+            $client->deleteUser(
+                [
+                    "userId" => "1",
+                ]
+            )
+        );
+
+        $request = $http->getLastRequest();
+        $this->assertInstanceOf(RequestInterface::class, $request);
+
+        if ($request instanceof RequestInterface) {
+            $request->getBody()->rewind();
+            $body = $request->getBody()->getContents();
+            $payload = json_decode($body, true);
+            $this->assertEquals(
+                [
+                    "identification" => [
+                        "userId" => "1",
+                    ],
+                ],
+                $payload
+            );
+        }
+    }
+
     public function test_it_upserts_user_without_user_id()
     {
         $factory = new Psr17Factory();
@@ -311,6 +418,112 @@ class ClientTest extends TestCase
                         "boolean" => true,
                         "number" => 22,
                         "date" => $now->format(DATE_ATOM),
+                    ],
+                ],
+                $payload
+            );
+        }
+    }
+
+    public function test_it_deletes_account()
+    {
+        $factory = new Psr17Factory();
+        $json = '{"message":"The data is correctly stored.","meta":{"status":202,"requestId":"01ETG3HQ4JY4HNNZ84FBJM3CSC"}}';
+        $http = new HttpClientFixed(new Response(202, [], $json));
+        $client = new Client($http, $factory, $factory, ["apiKey" => "key"]);
+        $now = new DateTimeImmutable("now");
+
+        $this->assertEquals(
+            new CallResult(true, false, 0, 0, [], null),
+            $client->deleteAccount(
+                [
+                    "accountId" => "1",
+                    "domain" => "journy.io",
+                ]
+            )
+        );
+
+        $request = $http->getLastRequest();
+        $this->assertInstanceOf(RequestInterface::class, $request);
+        if ($request instanceof RequestInterface) {
+            $request->getBody()->rewind();
+            $body = $request->getBody()->getContents();
+            $payload = json_decode($body, true);
+            $this->assertEquals(
+                [
+                    "identification" => [
+                        "accountId" => 1,
+                        "domain" => "journy.io",
+                    ],
+                ],
+                $payload
+            );
+            $this->assertNotEmpty($request->getHeader("user-agent"));
+            $this->assertEquals("php-sdk", explode("/", $request->getHeader("user-agent")[0])[0]);
+        }
+    }
+
+    public function test_it_deletes_account_without_account_id()
+    {
+        $factory = new Psr17Factory();
+        $json = '{"message":"The data is correctly stored.","meta":{"status":202,"requestId":"01ETG3HQ4JY4HNNZ84FBJM3CSC"}}';
+        $http = new HttpClientFixed(new Response(202, [], $json));
+        $client = new Client($http, $factory, $factory, ["apiKey" => "key"]);
+        $now = new DateTimeImmutable("now");
+
+        $this->assertEquals(
+            new CallResult(true, false, 0, 0, [], null),
+            $client->deleteAccount(
+                [
+                    "domain" => "journy.io",
+                ]
+            )
+        );
+
+        $request = $http->getLastRequest();
+        $this->assertInstanceOf(RequestInterface::class, $request);
+        if ($request instanceof RequestInterface) {
+            $request->getBody()->rewind();
+            $body = $request->getBody()->getContents();
+            $payload = json_decode($body, true);
+            $this->assertEquals(
+                [
+                    "identification" => [
+                        "domain" => "journy.io",
+                    ],
+                ],
+                $payload
+            );
+        }
+    }
+
+    public function test_it_deletes_account_without_domain()
+    {
+        $factory = new Psr17Factory();
+        $json = '{"message":"The data is correctly stored.","meta":{"status":202,"requestId":"01ETG3HQ4JY4HNNZ84FBJM3CSC"}}';
+        $http = new HttpClientFixed(new Response(202, [], $json));
+        $client = new Client($http, $factory, $factory, ["apiKey" => "key"]);
+        $now = new DateTimeImmutable("now");
+
+        $this->assertEquals(
+            new CallResult(true, false, 0, 0, [], null),
+            $client->deleteAccount(
+                [
+                    "accountId" => 1,
+                ]
+            )
+        );
+
+        $request = $http->getLastRequest();
+        $this->assertInstanceOf(RequestInterface::class, $request);
+        if ($request instanceof RequestInterface) {
+            $request->getBody()->rewind();
+            $body = $request->getBody()->getContents();
+            $payload = json_decode($body, true);
+            $this->assertEquals(
+                [
+                    "identification" => [
+                        "accountId" => 1,
                     ],
                 ],
                 $payload
