@@ -128,7 +128,7 @@ $call = $client->upsertUser([
 
 ```php
 $call = $client->deleteUser([
-    // required
+    // Must provide either an email address or userId or both
     "userId" => "userId", // Unique identifier for the user in your database
     "email" => "name@domain.tld",
 ]);
@@ -161,6 +161,7 @@ $call = $client->upsertAccount([
 
 ```php
 $call = $client->deleteAccount([
+    // Must provide either a domain or accountId or both
     "accountId" => "accountId", // Unique identifier for the account in your database
     "domain" => "acme-inc.com",
 ]);

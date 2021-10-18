@@ -549,7 +549,7 @@ final class Client
         $response->getBody()->rewind();
         $json = json_decode($response->getBody()->getContents(), true);
 
-        if ($response->getStatusCode() === 201) {
+        if ($response->getStatusCode() === 202) {
             return new CallResult(
                 true,
                 false,
@@ -667,7 +667,7 @@ final class Client
         $response->getBody()->rewind();
         $json = json_decode($response->getBody()->getContents(), true);
 
-        if ($response->getStatusCode() === 201) {
+        if ($response->getStatusCode() === 202) {
             return new CallResult(
                 true,
                 false,
