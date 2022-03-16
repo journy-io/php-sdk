@@ -303,7 +303,7 @@ final class Client
                     $this->requestFactory
                         ->createRequest(
                             "POST",
-                            new Uri("{$this->rootUrl}/events")
+                            new Uri("{$this->rootUrl}/track")
                         )
                         ->withHeader("content-type", "application/json")
                         ->withBody($body)

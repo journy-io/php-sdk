@@ -666,6 +666,8 @@ class ClientTest extends TestCase
         $request = $http->getLastRequest();
         $this->assertInstanceOf(RequestInterface::class, $request);
         if ($request instanceof RequestInterface) {
+            $this->assertEquals("POST", $request->getMethod());
+            $this->assertEquals("/track", $request->getUri()->getPath());
             $request->getBody()->rewind();
             $body = $request->getBody()->getContents();
             $payload = json_decode($body, true);
