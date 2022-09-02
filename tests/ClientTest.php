@@ -805,7 +805,7 @@ class ClientTest extends TestCase
                             "userId" => "1"
                         ],
                     ],
-                    "recordedAt" => $now->format(DATE_ATOM),
+                    "triggeredAt" => $now->format(DATE_ATOM),
                 ],
                 $payload
             );

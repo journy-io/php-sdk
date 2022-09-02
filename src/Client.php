@@ -287,7 +287,7 @@ final class Client
 
         $recordedAt = $event->getRecordedAt();
         if ($recordedAt instanceof DateTimeInterface) {
-            $payload["recordedAt"] = $recordedAt->format(DATE_ATOM);
+            $payload["triggeredAt"] = $recordedAt->format(DATE_ATOM);
         }
 
         $metadata = $event->getMetadata();
