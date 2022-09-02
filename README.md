@@ -3,6 +3,7 @@
 # journy.io PHP SDK
 
 [![Latest version on Packagist](https://img.shields.io/packagist/v/journy-io/sdk?color=%234d84f5&style=flat-square)](https://packagist.org/packages/journy-io/sdk)
+[![Downloads](https://img.shields.io/packagist/dt/journy-io/sdk?color=%234d84f5&style=flat-square)](https://packagist.org/packages/journy-io/sdk)
 [![Supported PHP versions](https://img.shields.io/packagist/php-v/journy-io/sdk?color=%234d84f5&style=flat-square)](https://packagist.org/packages/journy-io/sdk)
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE)
 
